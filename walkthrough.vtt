@@ -1,109 +1,106 @@
 WEBVTT
 
-00:00:00.000 --> 00:00:03.479
+00:00:00.000 --> 00:00:03.804
 A hospital marker tells us where a building is.
 
-00:00:03.479 --> 00:00:09.665
-It does not establish suitable care, or reveal how fragile access can be across a river.
+00:00:03.804 --> 00:00:09.299
+It does not establish suitable care or reveal fragile access across a river.
 
-00:00:09.665 --> 00:00:13.144
-This is VenomLink, a healthcare accessibility atlas for Lahore.
+00:00:09.299 --> 00:00:14.371
+VenomLink connects geographic evidence, real driving estimates, and infrastructure scenarios in Lahore.
 
-00:00:13.144 --> 00:00:15.463
-This walkthrough uses real application screens.
+00:00:14.371 --> 00:00:19.021
+This is a working hackathon prototype, shown through actual application screenshots.
 
-00:00:15.463 --> 00:00:19.716
-It is a planning prototype, with live provider setup still pending.
+00:00:19.821 --> 00:00:25.017
+Each independent facility record has coordinates, source links, quality, and a retrieval timestamp.
 
-00:00:20.516 --> 00:00:26.314
-Each independent facility record has source links, coordinates, quality, and a retrieval timestamp.
+00:00:25.017 --> 00:00:31.811
+Flip a card to inspect the actual record, served through the deployed private S three data path.
 
-00:00:26.314 --> 00:00:29.882
-Flip a card to inspect the actual record.
-
-00:00:29.882 --> 00:00:33.004
+00:00:31.811 --> 00:00:34.609
 Treatment capability and antivenom stock remain unknown.
 
-00:00:33.004 --> 00:00:36.571
+00:00:34.609 --> 00:00:37.807
 A retrieval date does not mean clinical verification.
 
-00:00:36.571 --> 00:00:41.031
-UVAS is a reference institution, excluded from human care comparisons.
+00:00:38.607 --> 00:00:43.629
+The separate planning model uses explicit assumptions about distance, speed and access overhead.
 
-00:00:41.831 --> 00:00:48.399
-The planning model uses declared assumptions: geographic distance, a detour factor, assumed speed, and access overhead.
-
-00:00:48.399 --> 00:00:53.324
+00:00:43.629 --> 00:00:48.265
 At twenty minutes, four of eight sample communities meet the baseline threshold.
 
-00:00:53.324 --> 00:00:57.839
-Making Shahdara Town T H Q eligible raises this to six.
+00:00:48.265 --> 00:00:52.515
+Making Shahdara Town T H Q eligible raises that to six.
 
-00:00:57.839 --> 00:01:04.407
-That is a hypothetical eligibility change, not a claim that real antivenom or treatment capacity exists.
+00:00:52.515 --> 00:00:57.538
+This is a hypothetical planning change, not a real treatment or stock claim.
 
-00:01:05.207 --> 00:01:12.965
-At a thirty minute threshold, a hypothetical twenty minute crossing delay reduces sampled access from five communities to four.
+00:00:58.338 --> 00:01:04.782
+At thirty minutes, a hypothetical crossing delay reduces sampled access from five communities to four.
 
-00:01:12.965 --> 00:01:15.823
-Only crossing dependent journeys receive the delay.
+00:01:04.782 --> 00:01:07.789
+Only crossing dependent journeys receive that delay.
 
-00:01:15.823 --> 00:01:19.906
-A closure removes those model paths without inventing a detour.
+00:01:07.789 --> 00:01:11.655
+Closure removes those model connections without inventing a detour.
 
-00:01:19.906 --> 00:01:22.764
-The percentages count sample communities, not population.
+00:01:11.655 --> 00:01:14.662
+These percentages count sample communities, not population.
 
-00:01:22.764 --> 00:01:25.622
-Highlight circles are not driving time polygons.
+00:01:14.662 --> 00:01:18.528
+The scenarios do not change Google's reported road conditions.
 
-00:01:26.422 --> 00:01:33.035
-The implemented A W S backend uses Amazon Location Search Nearby and Search Text through Lambda.
+00:01:19.328 --> 00:01:24.306
+Amazon Location Search Nearby and Search Text run through A W S Lambda.
 
-00:01:33.035 --> 00:01:36.341
-Discovery finds geographic candidates, not confirmed medical care.
+00:01:24.306 --> 00:01:27.752
+Hospital category searches returned no matches in our tests.
 
-00:01:36.341 --> 00:01:39.234
-Results stay in an attributed discovery list.
+00:01:27.752 --> 00:01:33.113
+An area search returned the actual Shahdara locality, clearly labeled as a geographic reference.
 
-00:01:39.234 --> 00:01:46.673
-Our account setup is pending, so the current app reports not connected, rather than substituting invented search results.
+00:01:33.113 --> 00:01:39.239
+Zero matches do not establish that hospitals are absent, and a locality is not medical care.
 
-00:01:47.473 --> 00:01:53.178
-Independent public records pass through Python validation and are prepared for private S three delivery.
+00:01:40.039 --> 00:01:44.646
+Python validation prepares independent public facts for private S three delivery.
 
-00:01:53.178 --> 00:01:55.840
-The current demo uses its bundled snapshot.
+00:01:44.646 --> 00:01:47.997
+Provider discovery stays in an attributed, temporary list.
 
-00:01:55.840 --> 00:02:00.404
-Optional Glue, Iceberg, and Athena scripts are included, but are not deployed.
+00:01:47.997 --> 00:01:50.510
+Google geometry stays on Google Maps.
 
-00:02:00.404 --> 00:02:04.969
-Provider search and route content are kept separate from the independent dataset.
+00:01:50.510 --> 00:01:54.280
+The backend route credential is stored in Secrets Manager.
 
-00:02:05.769 --> 00:02:11.940
-Google Maps and Traffic Layer are implemented with a protected Routes backend for actual driving estimates.
+00:01:54.280 --> 00:02:00.144
+Optional Iceberg and Athena scripts are included, but those analytics extensions are not deployed.
 
-00:02:11.940 --> 00:02:15.411
-They still need a billing enabled project and credentials.
+00:02:00.944 --> 00:02:06.301
+The no billing Google Maps Demo Key renders the map and supports Compute Routes.
 
-00:02:15.411 --> 00:02:19.269
-Traffic colors appear only when provider speed intervals are returned.
+00:02:06.301 --> 00:02:10.510
+The protected backend returns actual driving estimates and traffic speed intervals.
 
-00:02:19.269 --> 00:02:21.969
-Google route geometry belongs on Google Maps.
+00:02:10.510 --> 00:02:17.015
+An on demand comparison uses up to five supported route calls, avoiding the billing only matrix method.
 
-00:02:21.969 --> 00:02:25.054
-Model values remain clearly separate from live estimates.
+00:02:17.015 --> 00:02:19.311
+Provider limits can pause this prototype.
 
-00:02:25.854 --> 00:02:31.140
-The optional photo helper shows four labeled illustrations and a local image preview.
+00:02:19.311 --> 00:02:21.989
+Driving estimates are not ambulance response times.
 
-00:02:31.140 --> 00:02:35.207
+00:02:22.789 --> 00:02:27.887
+The optional photo helper contains labeled illustrations and a local image preview.
+
+00:02:27.887 --> 00:02:32.135
 No trained classifier is connected, and no identification is invented.
 
-00:02:35.207 --> 00:02:40.493
-VenomLink makes geographic access, its assumptions, and the evidence behind each point visible.
+00:02:32.135 --> 00:02:36.808
+VenomLink makes geographic access, its assumptions, and each point's evidence inspectable.
 
-00:02:40.493 --> 00:02:44.965
-The next step is live provider verification and real healthcare partnerships.
+00:02:36.808 --> 00:02:42.755
+Real healthcare partnerships and verified clinical data remain essential before any operational care use.
