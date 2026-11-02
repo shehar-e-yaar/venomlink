@@ -1,4 +1,9 @@
 import {
+  getSelectedRoute,
+  compareRoutes as compareProviderRoutes,
+} from "./services/routeGateway";
+import {
+  googleDirections,
   ANTIVENOM_LEADS,
   fastestRoute,
   miles,
@@ -256,7 +261,11 @@ export default function App() {
           batches.push(candidates.slice(i, i + 5));
         const responses = await Promise.all(
           batches.map((ids) =>
-            routeMatrix(origin, ids, c.signal).catch((error) => {
+            compareProviderRoutes(
+              origin,
+              ids.map((id) => facilities.find((f) => f.id === id)!),
+              c.signal,
+            ).catch((error) => {
               if (c.signal.aborted) throw error;
               return {
                 items: ids.map((facilityId) => ({
@@ -313,6 +322,7 @@ export default function App() {
     setRoute(null);
     setRouteError("");
     if (
+      !atlasActive ||
       !API ||
       mapMode !== "google" ||
       !selected ||
@@ -324,7 +334,7 @@ export default function App() {
     const timer = setTimeout(async () => {
       setRouteStatus("loading");
       try {
-        const d = await selectedRoute(origin, selected.id, c.signal);
+        const d = await getSelectedRoute(origin, selected, c.signal);
         if (!c.signal.aborted) {
           setRoute(d);
           setRouteStatus("connected");
@@ -340,7 +350,7 @@ export default function App() {
       clearTimeout(timer);
       c.abort();
     };
-  }, [origin, selectedId, mapMode, refreshNonce, dataset]);
+  }, [origin, selectedId, mapMode, atlasActive, refreshNonce, dataset]);
   useEffect(() => {
     if (!API || mapMode !== "google") return;
     const timer = setInterval(() => {
@@ -514,6 +524,12 @@ export default function App() {
           if (fastestHospital) select(fastestHospital);
         }}
         hasFastest={!!fastest}
+        directionsHref={
+          selected?.kind === "human-hospital"
+            ? googleDirections(origin, selected)
+            : ""
+        }
+        directionsName={selected?.name || "selected hospital"}
         facilities={directory}
         selectedId={selectedId}
         directoryQuery={directoryQuery}
@@ -572,6 +588,8 @@ export default function App() {
                 }
               }}
               routing={routeStatus === "loading"}
+              routeUnavailable={routeStatus === "error" && mapMode === "google"}
+              directionsHref={googleDirections(origin, selected)}
             />
           )
         }

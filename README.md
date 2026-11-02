@@ -17,7 +17,7 @@ The Maps Demo Key supports Compute Routes but the separate computeRouteMatrix me
 
 AWS hospital-category searches around the sample origin returned zero matches in the live checks. SearchText returned the actual Shahdara locality. The UI preserves this provider coverage gap: zero results do not establish that hospitals are absent, and a locality is not a treatment facility. AWS results stay in an attributed session-only discovery list, separate from the independent map dataset.
 
-Working interactions include origin selection, directory search, source-lineage flip cards, verification/geographic filters, live route inspection, on-demand comparisons, community access modeling, bridge delay/closure, a THQ planning upgrade, responsive layout, and local-only photo preview. Four photo-helper illustrations are labeled examples; **no trained classifier is connected**. Iceberg/Athena scripts are provided but have not been deployed or verified live.
+Working interactions include origin selection, directory search, data lineage, live routes, automatic comparison of seven user-listed hospital leads, responsive layouts, and real on-device snake classification. The supplied 498-class Snake Teller model runs through ONNX Runtime Web; the separate RT-DETR location detector is intentionally excluded. Photographs are processed locally and are not uploaded. Model matches are unverified species suggestions, not venom, safety or treatment determinations. See [model integration](design/model-integration.md). Iceberg/Athena scripts remain undeployed extensions.
 
 ## Run and verify
 

@@ -1,135 +1,160 @@
 import { useEffect, useRef, useState } from "react";
-import { ImagePlus, ShieldQuestion, Upload } from "lucide-react";
-const samples = [
-  {
-    name: "Spectacled cobra",
-    pattern: "hood",
-    note: "Illustrative species profile. A real model would need validated local training data.",
-  },
-  {
-    name: "Russell’s viper",
-    pattern: "spots",
-    note: "Illustrative species profile. Appearance alone does not establish treatment needs.",
-  },
-  {
-    name: "Common krait",
-    pattern: "bands",
-    note: "Illustrative species profile. A confidence score would not prove identification.",
-  },
-  {
-    name: "Ambiguous / blurry",
-    pattern: "blur",
-    note: "Unable to identify is an essential outcome. No prediction is being made here.",
-  },
-];
+import { ImagePlus, Upload, ScanLine, LoaderCircle } from "lucide-react";
+import { classifySnake, type SpeciesMatch } from "../services/snakeClassifier";
 export function SnakePhotoAssistant() {
-  const [sample, setSample] = useState(0),
-    [preview, setPreview] = useState<string | null>(null),
-    [error, setError] = useState("");
-  const input = useRef<HTMLInputElement>(null);
+  const [preview, setPreview] = useState<string | null>(null),
+    [matches, setMatches] = useState<SpeciesMatch[]>([]),
+    [status, setStatus] = useState(""),
+    [error, setError] = useState(""),
+    [busy, setBusy] = useState(false);
+  const input = useRef<HTMLInputElement>(null),
+    run = useRef(0);
   useEffect(
     () => () => {
       if (preview) URL.revokeObjectURL(preview);
     },
     [preview],
   );
+  useEffect(
+    () => () => {
+      run.current++;
+    },
+    [],
+  );
+  function choose(file?: File) {
+    if (!file) return;
+    if (
+      !["image/jpeg", "image/png", "image/webp"].includes(file.type) ||
+      file.size > 8 * 1024 * 1024
+    ) {
+      setError("Choose a JPEG, PNG or WebP under 8 MB.");
+      return;
+    }
+    run.current++;
+    setPreview(URL.createObjectURL(file));
+    setMatches([]);
+    setError("");
+    setStatus("");
+    setBusy(false);
+  }
+  async function analyze() {
+    if (!preview || busy) return;
+    const token = ++run.current;
+    setBusy(true);
+    setMatches([]);
+    setError("");
+    try {
+      const result = await classifySnake(preview, (s) => {
+        if (token === run.current) setStatus(s);
+      });
+      if (token === run.current) {
+        setMatches(result);
+        setStatus("Analysis complete / Snake Teller classifier");
+      }
+    } catch (e) {
+      if (token === run.current) {
+        setError((e as Error).message);
+        setStatus("");
+      }
+    } finally {
+      if (token === run.current) setBusy(false);
+    }
+  }
+  const uncertain =
+    matches.length > 0 &&
+    (matches[0].score < 0.5 || matches[0].score - matches[1].score < 0.1);
   return (
-    <>
-      <p className="intro-text">
-        Optional species information. Finding care never depends on a
-        photograph.
-      </p>
-      <div className="notice">
-        <ShieldQuestion size={19} />
-        <div>
-          <strong>No trained model is configured.</strong>
-          <p>
-            These four illustrated samples are educational UI examples, not
-            photos or AI predictions. Uploaded images are previewed locally and
-            are not sent or stored.
-          </p>
-        </div>
-      </div>
-      <div className="photo-grid">
-        {samples.map((s, i) => (
-          <button
-            key={s.name}
-            className={sample === i ? "active" : ""}
-            onClick={() => setSample(i)}
-          >
-            <svg viewBox="0 0 140 90" aria-hidden="true">
-              <path
-                d={
-                  i === 0
-                    ? "M70 76Q105 67 87 45Q65 18 74 14Q91 15 92 29"
-                    : i === 1
-                      ? "M20 70Q115 85 95 50Q72 16 47 46Q30 70 95 67"
-                      : i === 2
-                        ? "M25 70Q100 75 98 44Q95 17 65 30Q33 50 66 55"
-                        : "M22 65Q90 80 92 48Q91 22 57 39"
-                }
-                fill="none"
-                stroke={i === 3 ? "#bbb6a6" : "#8b8664"}
-                strokeWidth={i === 0 ? 13 : 10}
-                strokeLinecap="round"
-                strokeDasharray={i === 2 ? "8 3" : i === 1 ? "3 4" : undefined}
-              />
-              <circle
-                cx={i === 0 ? 89 : i === 1 ? 95 : i === 2 ? 66 : 57}
-                cy={i === 0 ? 24 : i === 1 ? 67 : i === 2 ? 55 : 39}
-                r="4"
-                fill="#3b3b32"
-              />
-            </svg>
-            <strong>{s.name}</strong>
-            <small>Illustrative sample {i + 1}</small>
-          </button>
-        ))}
-      </div>
-      <div className="sample-explanation">
-        <span className="eyebrow">INFORMATIONAL SAMPLE · NO INFERENCE</span>
-        <h3>{samples[sample].name}</h3>
-        <p>{samples[sample].note}</p>
-      </div>
+    <div className="snake-photo-assistant">
       <input
+        ref={input}
         type="file"
         accept="image/jpeg,image/png,image/webp"
-        ref={input}
         hidden
-        onChange={(e) => {
-          const f = e.target.files?.[0];
-          if (!f) return;
-          if (
-            !["image/jpeg", "image/png", "image/webp"].includes(f.type) ||
-            f.size > 8 * 1024 * 1024
-          ) {
-            setError("Choose a JPEG, PNG or WebP under 8 MB.");
-            return;
-          }
-          if (preview) URL.revokeObjectURL(preview);
-          setPreview(URL.createObjectURL(f));
-          setError("");
-        }}
+        aria-label="Choose snake image"
+        onChange={(e) => choose(e.target.files?.[0])}
       />
-      <button className="outline-button" onClick={() => input.current?.click()}>
-        <Upload size={15} />
-        Preview your photo locally
-      </button>
-      {error && <p role="alert">{error}</p>}
+      <div
+        className={`snake-uploader ${preview ? "has-photo" : ""}`}
+        onDragOver={(e) => e.preventDefault()}
+        onDrop={(e) => {
+          e.preventDefault();
+          choose(e.dataTransfer.files[0]);
+        }}
+      >
+        {preview ? (
+          <img src={preview} alt="Your selected snake photo" />
+        ) : (
+          <>
+            <ImagePlus size={32} strokeWidth={1.2} />
+            <strong>Start with a snake photo.</strong>
+            <p>Drop an image here, or choose one below.</p>
+            <button
+              className="outline-button"
+              onClick={() => input.current?.click()}
+            >
+              <Upload size={15} />
+              Choose photo
+            </button>
+          </>
+        )}
+      </div>
       {preview && (
-        <div className="uploaded-preview">
-          <img src={preview} alt="Your locally selected snake image" />
+        <div className="snake-id-actions">
+          <button className="dark-button" onClick={analyze} disabled={busy}>
+            {busy ? (
+              <LoaderCircle size={16} className="spin" />
+            ) : (
+              <ScanLine size={16} />
+            )}{" "}
+            {busy ? "Analyzing..." : "Identify species"}
+          </button>
+          <button
+            className="quiet-link"
+            onClick={() => input.current?.click()}
+            disabled={busy}
+          >
+            Change photo
+          </button>
+        </div>
+      )}
+      {status && (
+        <p className="photo-state" role="status" aria-live="polite">
+          {status}
+        </p>
+      )}
+      {error && (
+        <p className="photo-state" role="alert">
+          {error}
+        </p>
+      )}
+      {matches.length > 0 && (
+        <div className="snake-predictions">
+          <small>
+            {uncertain
+              ? "UNCERTAIN MATCH / REVIEW REQUIRED"
+              : "POSSIBLE SPECIES / NOT VERIFIED"}
+          </small>
+          <h3>{matches[0].name}</h3>
+          <ol>
+            {matches.map((m) => (
+              <li key={m.name}>
+                <span>{m.name}</span>
+                <span>{(m.score * 100).toFixed(1)}% score</span>
+              </li>
+            ))}
+          </ol>
           <p>
-            Preview only. Model unavailable; no species, venom or danger
-            determination.
+            Model scores are not proof of identification. This classifier can
+            assign a snake label to a non-snake photo.
           </p>
         </div>
       )}
-      <p className="safety-note">
-        Never approach or handle a snake to obtain a photo. An image cannot
-        establish that a snake is harmless, rule out a bite, or determine
-        antivenom treatment.
-      </p>
-    </>
+      <div className="snake-photo-footer">
+        <p>
+          Private, on-device analysis. Never handle a snake for a photo. A
+          prediction does not determine venom, safety or treatment.
+        </p>
+      </div>
+    </div>
   );
 }

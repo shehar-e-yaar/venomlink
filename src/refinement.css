@@ -780,3 +780,238 @@
     display: none;
   }
 }
+/* Clear visual lanes around the full snake */
+@media (min-width: 601px) {
+  .hero-context {
+    left: 6%;
+    right: auto;
+    top: 50px;
+    width: 220px;
+  }
+  .hero-discovery {
+    left: 6%;
+    right: auto;
+    top: 265px;
+    bottom: auto;
+    width: 220px;
+  }
+  .hero-coordinate {
+    left: 6%;
+    bottom: 26px;
+  }
+  .hero-heading {
+    padding-bottom: 14px;
+  }
+}
+@media (min-width: 601px) and (max-width: 1150px) {
+  .hero-context {
+    left: 5%;
+    width: 190px;
+    padding: 18px;
+  }
+  .hero-discovery {
+    left: 5%;
+    width: 190px;
+    padding: 18px;
+  }
+  .hero-snake {
+    width: 70%;
+    max-width: none;
+    left: 71%;
+    margin-left: -43%;
+    top: 45px;
+  }
+  .hero-coordinate {
+    left: 5%;
+  }
+  .snake-stage {
+    height: 550px;
+  }
+}
+.snake-id-section {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  align-items: center;
+  gap: 9%;
+  padding: 75px 7%;
+  background:
+    radial-gradient(ellipse at 75% 50%, #dbeaf4aa, transparent 65%), #f7fafc;
+  scroll-margin-top: 110px;
+}
+.snake-id-copy h2 {
+  font-size: clamp(40px, 4.4vw, 68px);
+  letter-spacing: -2.5px;
+  line-height: 1.06;
+  margin: 18px 0 22px;
+}
+.snake-id-copy > p:last-of-type {
+  font-size: 15px;
+  line-height: 1.65;
+  max-width: 300px;
+}
+.model-badge {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 0.4px;
+  color: #68818e;
+  margin-top: 26px;
+  border: 1px solid #d8e5ed;
+  border-radius: 20px;
+  padding: 10px 14px;
+}
+.snake-id-tool {
+  padding: 26px;
+  min-width: 0;
+}
+.snake-uploader {
+  position: relative;
+  border: 1px dashed #bfd1de;
+  border-radius: 20px;
+  min-height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 14px;
+  padding: 24px;
+  text-align: center;
+  background: #f5faff9c;
+  overflow: hidden;
+}
+.snake-uploader.has-photo {
+  padding: 12px;
+}
+.snake-uploader img {
+  width: 100%;
+  height: 250px;
+  object-fit: contain;
+  border-radius: 12px;
+}
+.snake-uploader > svg {
+  color: #6e8a9f;
+}
+.snake-uploader strong {
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.4px;
+}
+.snake-uploader p {
+  font-size: 12px;
+  line-height: 1.5;
+}
+.snake-id-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 16px;
+  flex-wrap: wrap;
+}
+.snake-id-actions button {
+  font-size: 12px;
+}
+.snake-predictions {
+  margin-top: 20px;
+  padding: 20px;
+  background: #ffffff96;
+  border: 1px solid #fff;
+  border-radius: 18px;
+}
+.snake-predictions h3 {
+  font-size: 24px;
+  letter-spacing: -0.6px;
+  margin: 8px 0;
+}
+.snake-predictions small {
+  font-size: 10px;
+  color: #7c8b96;
+}
+.snake-predictions p,
+.photo-limit-note {
+  font-size: 12px !important;
+  line-height: 1.65;
+  margin-top: 12px !important;
+}
+.snake-predictions ol {
+  padding: 0;
+  list-style: none;
+  margin: 14px 0 0;
+}
+.snake-predictions li {
+  display: flex;
+  justify-content: space-between;
+  padding: 8px 0;
+  gap: 18px;
+  font-size: 12px;
+  border-top: 1px solid #e5edf2;
+}
+.photo-state {
+  font-size: 12px;
+  color: #637b8d;
+  padding: 12px 0;
+}
+.snake-photo-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  margin-top: 18px;
+}
+.snake-photo-footer p {
+  font-size: 11px;
+  line-height: 1.6;
+  max-width: 420px;
+}
+.snake-preview-only {
+  background: #f0f5f9;
+}
+@media (max-width: 850px) {
+  .snake-id-section {
+    gap: 5%;
+    padding: 55px 5%;
+    grid-template-columns: 0.8fr 1.2fr;
+  }
+  .snake-id-copy h2 {
+    font-size: 44px;
+  }
+  .snake-id-tool {
+    padding: 20px;
+  }
+  .snake-uploader {
+    min-height: 240px;
+  }
+}
+@media (max-width: 600px) {
+  .snake-id-section {
+    grid-template-columns: 1fr;
+    padding: 46px 6%;
+    gap: 24px;
+  }
+  .snake-id-copy h2 {
+    font-size: 42px;
+    letter-spacing: -1.8px;
+    margin: 14px 0;
+  }
+  .snake-id-copy > p:last-of-type {
+    font-size: 14px;
+  }
+  .model-badge {
+    margin-top: 16px;
+    font-size: 9px;
+  }
+  .snake-id-tool {
+    padding: 16px;
+  }
+  .snake-uploader {
+    min-height: 235px;
+    padding: 18px;
+  }
+  .snake-uploader img {
+    height: 230px;
+  }
+  .snake-predictions {
+    padding: 16px;
+  }
+  .product-nav a {
+    padding: 14px 16px;
+  }
+}

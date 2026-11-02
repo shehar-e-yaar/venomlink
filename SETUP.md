@@ -79,4 +79,4 @@ Check actual S3 delivery metadata, AWS Discovery responses, Google map rendering
 
 Build the frontend with the intended base path and API URL. GitHub Pages uses /venomlink/; local preview uses /. Local development origins on port 5190 and the exact published origin are allowed by the API. Keep .env.local, .venv, .tools, build and .aws-sam outside Git. Public static builds necessarily include the browser demo key; repository source must not contain credentials.
 
-Optional Iceberg/Athena scripts remain extensions, not verified cloud paths. No trained snake classifier or confirmed clinical capabilities/stocks are supplied. Record a public video under three minutes and review the final hackathon submission before posting it.
+Optional Iceberg/Athena scripts remain extensions, not verified cloud paths. The supplied Snake Teller classifier is deployed as browser ONNX assets; clinical capability and antivenom stock remain unconfirmed. Record a public video under three minutes and review the final hackathon submission before posting it.

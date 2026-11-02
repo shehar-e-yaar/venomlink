@@ -29,3 +29,9 @@ export function fastestRoute(items: MatrixItem[]) {
   );
 }
 export const miles = (meters: number) => (meters / 1609.344).toFixed(1);
+
+export const googleDirections = (
+  origin: { lat: number; lng: number },
+  facility: { lat: number; lng: number },
+) =>
+  `https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(`${origin.lat},${origin.lng}`)}&destination=${encodeURIComponent(`${facility.lat},${facility.lng}`)}&travelmode=driving`;

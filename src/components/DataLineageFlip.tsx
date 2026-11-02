@@ -10,6 +10,8 @@ export function DataLineageFlip({
   onClose,
   onRoute,
   routing,
+  routeUnavailable = false,
+  directionsHref,
 }: {
   facility: Facility;
   datasetVersion: string;
@@ -19,6 +21,8 @@ export function DataLineageFlip({
   onClose: () => void;
   onRoute: () => void;
   routing: boolean;
+  routeUnavailable?: boolean;
+  directionsHref?: string;
 }) {
   const [flip, setFlip] = useState(false);
   useEffect(() => setFlip(false), [facility.id]);
@@ -57,7 +61,7 @@ export function DataLineageFlip({
             <strong>
               {liveRoute
                 ? Math.round(liveRoute.durationSec / 60)
-                : journey?.available
+                : !routeUnavailable && journey?.available
                   ? Math.round(journey.minutes)
                   : "—"}
               <small>{liveRoute || journey?.available ? "min" : ""}</small>
@@ -65,13 +69,15 @@ export function DataLineageFlip({
             <span>
               {liveRoute
                 ? "Google driving estimate"
-                : journey?.available
+                : !routeUnavailable && journey?.available
                   ? "Illustrative planning estimate"
-                  : "No modeled connection"}
+                  : routeUnavailable
+                    ? "Live route unavailable"
+                    : "No modeled connection"}
               <br />
               {liveRoute
                 ? `${(liveRoute.distanceMeters / 1000).toFixed(1)} km`
-                : journey
+                : !routeUnavailable && journey
                   ? `${journey.distanceKm.toFixed(1)} km modeled path`
                   : ""}
             </span>
@@ -81,15 +87,28 @@ export function DataLineageFlip({
               ? "Not a human emergency-care facility"
               : "Snakebite capability & antivenom unconfirmed"}
           </div>
-          {facility.kind === "human-hospital" && (
-            <button
+          {facility.kind === "human-hospital" &&
+          routeUnavailable &&
+          directionsHref ? (
+            <a
               className="dark-button wide"
-              disabled={routing}
-              onClick={onRoute}
+              href={directionsHref}
+              target="_blank"
+              rel="noreferrer"
             >
-              {routing ? "Calculating…" : "Compare / refresh route"}
-              <ArrowUpRight size={13} />
-            </button>
+              Open Google Maps <ArrowUpRight size={13} />
+            </a>
+          ) : (
+            facility.kind === "human-hospital" && (
+              <button
+                className="dark-button wide"
+                disabled={routing}
+                onClick={onRoute}
+              >
+                {routing ? "Calculating…" : "Compare / refresh route"}
+                <ArrowUpRight size={13} />
+              </button>
+            )
           )}
           <button className="lineage-button" onClick={() => setFlip(true)}>
             <Code2 size={13} />

@@ -1,3 +1,4 @@
+import { SnakePhotoAssistant } from "./SnakePhotoAssistant";
 import { useState, type ReactNode, type RefObject } from "react";
 import {
   motion,
@@ -38,6 +39,8 @@ type Props = {
   automaticRoute: string;
   comparisonScope: string;
   hasFastest: boolean;
+  directionsHref: string;
+  directionsName: string;
   onFastest: () => void;
   facilities: Facility[];
   selectedId: string | null;
@@ -141,6 +144,9 @@ export function ProductExperience(p: Props) {
           className={menuOpen ? "product-nav is-open" : "product-nav"}
           aria-label="Main navigation"
         >
+          <a href="#snake-id" onClick={() => setMenuOpen(false)}>
+            Snake ID
+          </a>
           <a href="#vision" onClick={() => setMenuOpen(false)}>
             The vision
           </a>
@@ -271,6 +277,26 @@ export function ProductExperience(p: Props) {
             How it connects
             <ArrowUpRight size={13} />
           </button>
+        </section>
+        <section
+          className="snake-id-section"
+          id="snake-id"
+          aria-labelledby="snake-id-title"
+        >
+          <Reveal className="snake-id-copy">
+            <p className="product-eyebrow">YOUR SNAKE CLASSIFIER</p>
+            <h2 id="snake-id-title">
+              A photo.
+              <br />A closer look.
+            </h2>
+            <p>Explore a possible species, then find care.</p>
+            <span className="model-badge">
+              498 species / runs on your device
+            </span>
+          </Reveal>
+          <div className="snake-id-tool glass-panel">
+            <SnakePhotoAssistant />
+          </div>
         </section>
         <section className="vision-section" id="vision">
           <Reveal className="vision-copy">
@@ -491,6 +517,17 @@ export function ProductExperience(p: Props) {
               </button>
             )}
           </div>
+          {!p.hasFastest && p.directionsHref && (
+            <a
+              className="maps-directions-link quiet-link"
+              href={p.directionsHref}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Open directions to {p.directionsName} in Google Maps{" "}
+              <ArrowUpRight size={14} />
+            </a>
+          )}
           <p className="hospital-legend">
             <b>A?</b> User-listed antivenom lead <span>Stock unconfirmed</span>{" "}
             <b>H</b> Other hospital <b>R</b> Reference
