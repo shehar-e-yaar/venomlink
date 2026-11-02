@@ -33,7 +33,8 @@ import {
 import communityData from "../public/data/communities.json";
 import { LiveTrafficMap, type MapMode } from "./components/LiveTrafficMap";
 import { DataLineageFlip } from "./components/DataLineageFlip";
-import { CoverageGauge } from "./components/CoverageGauge";
+import { ProductExperience } from "./components/ProductExperience";
+import { RouteComparison } from "./components/RouteComparison";
 import { Dialog } from "./components/Dialog";
 import { SnakePhotoAssistant } from "./components/SnakePhotoAssistant";
 import { AWSLocationDiscovery } from "./components/AWSLocationDiscovery";
@@ -66,6 +67,7 @@ import type {
 } from "./types";
 const communities = communityData as Origin[];
 type Modal =
+  | "routes"
   | "origin"
   | "traffic"
   | "planner"
@@ -91,7 +93,7 @@ export default function App() {
     [northOnly, setNorthOnly] = useState(false),
     [verifiedOnly, setVerifiedOnly] = useState(false),
     [traffic, setTraffic] = useState(false),
-    [showZones, setShowZones] = useState(true),
+    [showZones, setShowZones] = useState(false),
     [mapMode, setMapMode] = useState<MapMode>("loading"),
     [focusToken, setFocusToken] = useState(0),
     [modal, setModal] = useState<Modal>(null),
@@ -423,586 +425,77 @@ export default function App() {
   const difference = route
     ? delaySeconds(route.durationSec, route.staticSec)
     : null;
+  const compareRoutes = () => {
+    setMatrixNonce((n) => n + 1);
+    if (!MAPS_DEMO) setRefreshNonce((n) => n + 1);
+    setModal(API && mapMode === "google" ? "routes" : "traffic");
+  };
   return (
-    <div className="app-shell">
-      <header className="main-header">
-        <button className="brand" onClick={reset} aria-label="VenomLink home">
-          <span className="brand-mark">
-            <Diamond size={20} />
-            <span />
-          </span>
-          <strong>VENOMLINK</strong>
-          <small>LAHORE / PK</small>
-        </button>
-        <nav aria-label="Main navigation">
-          {[
-            { label: "Care Finder", value: null },
-            { label: "Live Traffic", value: "traffic" },
-            { label: "Planner Simulator", value: "planner" },
-            { label: "Photo AI Assistant", value: "photo" },
-            { label: "S3 / Iceberg Data", value: "data" },
-            { label: "AWS Architecture", value: "architecture" },
-          ].map((n) => (
-            <button
-              key={n.label}
-              className={modal === n.value ? "active" : ""}
-              onClick={() => {
-                setModal(n.value as Modal);
-                if (n.value === null)
-                  mapSection.current?.scrollIntoView({
-                    behavior: "smooth",
-                    block: "start",
-                  });
-              }}
-            >
-              {n.label}
-            </button>
-          ))}
-        </nav>
-      </header>
-      <main>
-        <section className="page-heading">
-          <div>
-            <p className="eyebrow">
-              GEOGRAPHIC INTELLIGENCE. HUMAN CONSEQUENCES.
-            </p>
-            <h1>
-              Snakebite Care & Access Atlas<span>↗</span>
-            </h1>
-            <p>Explore emergency healthcare accessibility across Lahore.</p>
-          </div>
-          <div className="mode-pill">
-            <span
-              className={
-                awsStatus === "connected"
-                  ? "status-dot connected"
-                  : "status-dot"
-              }
-            />
-            {awsStatus === "connected"
-              ? "AWS discovery connected"
-              : MAPS_DEMO
-                ? "Prototype · Maps Demo Key"
-                : "Demo Mode"}
-            <button
-              onClick={() => setModal("architecture")}
-              aria-label="View connection details"
-            >
-              <Info size={13} />
-            </button>
-          </div>
-        </section>
-        <div className="filter-bar">
-          <div className="filter-pills">
-            <button
-              className={!northOnly ? "active" : ""}
-              onClick={() => setNorthOnly(false)}
-            >
-              <Globe2 size={13} />
-              All Lahore
-            </button>
-            <button
-              className={northOnly ? "active" : ""}
-              onClick={() => setNorthOnly((v) => !v)}
-            >
-              North of Ravi
-            </button>
-            <button
-              className={scenario.delay || scenario.closure ? "active" : ""}
-              onClick={() => setModal("planner")}
-            >
-              <GitBranch size={13} />
-              Bridge Scenario
-            </button>
-            <button
-              className={verifiedOnly ? "active" : ""}
-              onClick={() => setVerifiedOnly((v) => !v)}
-              title="Filter by independently confirmed clinical capability"
-            >
-              <ShieldCheck size={13} />
-              Verified Only
-            </button>
-            <button
-              className={traffic && mapMode === "google" ? "active" : ""}
-              onClick={toggleTraffic}
-            >
-              <Activity size={13} />
-              Traffic Overlay
-            </button>
-          </div>
-          <button className="text-button" onClick={() => setModal("data")}>
-            <Database size={13} />
-            Sources & limitations
-            <ArrowUpRight size={12} />
-          </button>
-        </div>
-        <section className="summary-grid" aria-label="Explore the atlas">
-          <article className="summary-card card">
-            <div className="summary-content">
-              <span className="eyebrow">01 / YOUR STARTING POINT</span>
-              <h2>
-                {origin.id === "shahdara"
-                  ? "Shahdara & North Ravi"
-                  : origin.name}
-              </h2>
-              <p>Select your origin · Explore nearby care</p>
-              <button className="small-dark" onClick={() => setModal("origin")}>
-                Choose community
-                <ArrowUpRight size={13} />
-              </button>
-            </div>
-            <div className="location-art" aria-hidden="true">
-              <svg viewBox="0 0 140 140">
-                <path d="M-5 40L145 95M-5 70L145 125M20 -5L80 145M70 -5L130 145" />
-                <path className="art-river" d="M-5 5Q90 45 60 80T130 145" />
-                <circle cx="78" cy="64" r="22" />
-                <circle cx="78" cy="64" r="7" />
-              </svg>
-              <MapPin size={28} />
-            </div>
-          </article>
-          <article className="summary-card traffic-summary card">
-            <div className="summary-content">
-              <span className="eyebrow">02 / THE WAY THERE</span>
-              <h2>Road Access Intelligence</h2>
-              <p>
-                {mapMode === "google"
-                  ? "Traffic overlay available · Routes via backend"
-                  : "Traffic unavailable · Planning model ready"}
-              </p>
-              <button
-                className="small-dark"
-                onClick={() => setModal("planner")}
-              >
-                Open planner
-                <ArrowUpRight size={13} />
-              </button>
-            </div>
-            <div className="route-art" aria-hidden="true">
-              <svg viewBox="0 0 150 140">
-                <path d="M10 115L50 115Q70 115 70 95V55Q70 35 90 35H130" />
-                <circle cx="10" cy="115" r="9" />
-                <circle cx="130" cy="35" r="12" />
-              </svg>
-              <span>WHAT IF?</span>
-            </div>
-          </article>
-          <article className="summary-card photo-summary card">
-            <div className="summary-content">
-              <span className="eyebrow">03 / OPTIONAL ASSISTANCE</span>
-              <h2>AI Species Helper</h2>
-              <p>A photo should never delay finding care.</p>
-              <button
-                className="small-outline"
-                onClick={() => setModal("photo")}
-              >
-                View sample profiles
-                <ArrowUpRight size={13} />
-              </button>
-            </div>
-            <div className="snake-art" aria-hidden="true">
-              <svg viewBox="0 0 140 140">
-                <path d="M28 105Q120 125 102 80Q92 54 67 75Q45 97 90 96Q120 95 100 55Q77 19 87 17Q107 18 105 40" />
-                <circle cx="103" cy="28" r="2" />
-              </svg>
-            </div>
-          </article>
-        </section>
-        {!dataset && !dataError && (
-          <div className="dataset-warning" role="status">
-            <RefreshCw size={15} className="spin" />
-            Loading independent facility records…
-          </div>
-        )}
-        {dataError && (
-          <div className="dataset-warning" role="status">
-            <Info size={15} />
-            {dataError}
-          </div>
-        )}
-        <section className="dashboard-grid">
-          <section className="map-card card" ref={mapSection}>
-            <div className="map-card-header">
-              <div>
-                <span className="eyebrow">EXPLORE / COMPARE / UNDERSTAND</span>
-                <h2>
-                  Map Session<span>— Lahore Care Access & Routing</span>
-                </h2>
-              </div>
-              <div className="map-actions">
-                <button
-                  className={showZones ? "icon-button active" : "icon-button"}
-                  onClick={() => setShowZones((v) => !v)}
-                  aria-label="Toggle modeled community highlights"
-                  aria-pressed={showZones}
-                >
-                  <Layers size={17} />
-                </button>
-                <button
-                  className="icon-button"
-                  onClick={reset}
-                  aria-label="Reset map and scenarios"
-                >
-                  <RefreshCw size={16} />
-                </button>
-              </div>
-            </div>
-            <div className="map-stage">
-              <LiveTrafficMap
-                facilities={markerFacilities}
-                origin={origin}
-                selected={selected}
-                onSelect={select}
-                onOrigin={choosePoint}
-                traffic={traffic}
-                journey={journey}
-                liveRoute={route}
-                coverage={coverage}
-                showZones={showZones}
-                onMode={setMapMode}
-                focusToken={focusToken}
-              />
-              {selected && (
-                <DataLineageFlip
-                  facility={selected}
-                  datasetVersion={dataset?.version || "loading"}
-                  dataSource={dataSource}
-                  journey={journey}
-                  liveRoute={route}
-                  onClose={() => setSelectedId(null)}
-                  onRoute={() => {
-                    setRefreshNonce((n) => n + 1);
-                    if (!API || mapMode !== "google") {
-                      setNotice(
-                        "Live driving routes are not configured. The dashed line is an illustrative planning path.",
-                      );
-                      setModal("traffic");
-                    }
-                  }}
-                  routing={routeStatus === "loading"}
-                />
-              )}
-              <div className="community-label">
-                <MapPin size={13} />
-                {origin.name}
-                <span>Selected origin</span>
-              </div>
-            </div>
-            <div className="map-footer">
-              <div className="map-legend">
-                <span>
-                  <i className="legend-origin" />
-                  Origin
-                </span>
-                <span>
-                  <i className="legend-facility" />
-                  Independent facility
-                </span>
-                <span>
-                  <i className="legend-reference" />
-                  Reference only
-                </span>
-              </div>
-              <button onClick={() => setModal("aws")} className="aws-link">
-                <Cloud size={14} />
-                AWS Location Discovery
-                <ArrowUpRight size={12} />
-              </button>
-            </div>
-            <div className="scenario-strip">
-              <span className="scenario-tag">
-                <GitBranch size={13} />
-                {activeScenario}
-              </span>
-              <span>
-                Estimated Care-Access Zones = sampled-community highlights, not
-                isochrones
-              </span>
-              <button onClick={() => setModal("planner")}>
-                Adjust model
-                <Settings2 size={12} />
-              </button>
-            </div>
-          </section>
-          <aside className="right-column">
-            {dataset ? (
-              <CoverageGauge
-                coverage={coverage}
-                scenario={scenario}
-                onExplain={() => setModal("planner")}
-              />
-            ) : (
-              <section className="coverage-card card" role="status">
-                <h2>Care-Access Status</h2>
-                <p>
-                  {dataError
-                    ? "Facility data unavailable. Reload to retry."
-                    : "Loading independent records before calculating access…"}
-                </p>
-              </section>
-            )}
-            <section className="directory-card">
-              <div className="directory-heading">
-                <div>
-                  <span className="eyebrow">
-                    A DIRECTORY, NOT A RECOMMENDATION
-                  </span>
-                  <h2>Facilities & Geographic Access</h2>
-                </div>
-                <span className="directory-count">{directory.length}</span>
-              </div>
-              <label className="directory-search">
-                <Search size={13} />
-                <input
-                  aria-label="Search facility directory"
-                  placeholder="Find a facility…"
-                  value={directoryQuery}
-                  onChange={(e) => setDirectoryQuery(e.target.value)}
-                />
-              </label>
-              <div className="directory-rows">
-                {directory.map((f) => {
-                  const item = matrix.find((m) => m.facilityId === f.id);
-                  const j = planJourney(origin, f, scenario);
-                  return (
-                    <button
-                      key={f.id}
-                      className={`directory-row ${selectedId === f.id ? "selected" : ""}`}
-                      onClick={() => select(f)}
-                    >
-                      <span className="facility-icon">
-                        {f.kind === "reference" ? (
-                          <MapPin size={15} />
-                        ) : (
-                          <Hospital size={15} />
-                        )}
-                      </span>
-                      <span className="directory-name">
-                        <strong>{f.name}</strong>
-                        <small>
-                          {f.neighborhood} ·{" "}
-                          {f.kind === "reference"
-                            ? "Reference only"
-                            : "Care suitability unknown"}
-                        </small>
-                      </span>
-                      <span className="directory-eta">
-                        {item?.durationSec !== null &&
-                        item?.durationSec !== undefined
-                          ? `${Math.round(item.durationSec / 60)}m`
-                          : f.kind === "reference"
-                            ? "REF"
-                            : j.available
-                              ? `~${Math.round(j.minutes)}m`
-                              : "—"}
-                        <small>
-                          {item?.durationSec !== null &&
-                          item?.durationSec !== undefined
-                            ? "Google"
-                            : "model"}
-                        </small>
-                      </span>
-                    </button>
+    <>
+      <ProductExperience
+        origin={origin}
+        facilities={directory}
+        selectedId={selectedId}
+        directoryQuery={directoryQuery}
+        onDirectoryQuery={setDirectoryQuery}
+        onSelect={select}
+        onOpen={setModal}
+        onHome={reset}
+        onCompare={compareRoutes}
+        onTraffic={toggleTraffic}
+        traffic={traffic}
+        mapMode={mapMode}
+        northOnly={northOnly}
+        verifiedOnly={verifiedOnly}
+        onNorth={() => setNorthOnly((v) => !v)}
+        onVerified={() => setVerifiedOnly((v) => !v)}
+        onAll={() => {
+          setNorthOnly(false);
+          setVerifiedOnly(false);
+        }}
+        dataSource={dataSource}
+        dataError={dataError}
+        awsStatus={awsStatus}
+        mapSection={mapSection}
+        map={
+          <LiveTrafficMap
+            facilities={markerFacilities}
+            origin={origin}
+            selected={selected}
+            onSelect={select}
+            onOrigin={choosePoint}
+            traffic={traffic}
+            journey={journey}
+            liveRoute={route}
+            coverage={coverage}
+            showZones={showZones}
+            onMode={setMapMode}
+            focusToken={focusToken}
+          />
+        }
+        popup={
+          selected && (
+            <DataLineageFlip
+              facility={selected}
+              datasetVersion={dataset?.version || "loading"}
+              dataSource={dataSource}
+              journey={journey}
+              liveRoute={route}
+              onClose={() => setSelectedId(null)}
+              onRoute={() => {
+                setRefreshNonce((n) => n + 1);
+                if (!API || mapMode !== "google") {
+                  setNotice(
+                    "Live driving routes are not configured. The dashed line is an illustrative planning path.",
                   );
-                })}
-                {!directory.length && (
-                  <div className="empty-directory">
-                    <ShieldQuestion size={24} />
-                    <strong>
-                      {!dataset
-                        ? dataError
-                          ? "Facility records unavailable."
-                          : "Loading facility records…"
-                        : verifiedOnly
-                          ? "No matching verified facilities."
-                          : "No matching facilities."}
-                    </strong>
-                    <p>
-                      {!dataset
-                        ? "Source records must load before this directory can be explored."
-                        : verifiedOnly
-                          ? "No snakebite-treatment capabilities have been independently confirmed in this dataset. Turn off Verified Only to inspect source-linked candidates."
-                          : "Try another name or clear the geographic filter."}
-                    </p>
-                  </div>
-                )}
-              </div>
-              <footer>
-                <span>
-                  <i />
-                  Independent public records
-                </span>
-                <button onClick={() => setModal("data")}>
-                  View lineage
-                  <ArrowUpRight size={12} />
-                </button>
-              </footer>
-            </section>
-          </aside>
-        </section>
-        <section className="bottom-grid">
-          <article className="comparison-card card">
-            <div className="card-heading">
-              <div>
-                <span className="eyebrow">
-                  PROXIMITY IS ONLY PART OF THE STORY
-                </span>
-                <h2>Compare the way to care</h2>
-              </div>
-              <button
-                className="outline-button"
-                onClick={() => {
-                  setMatrixNonce((n) => n + 1);
-                  if (!MAPS_DEMO) setRefreshNonce((n) => n + 1);
-                  if (!API || mapMode !== "google") setModal("traffic");
-                }}
-                disabled={matrixStatus === "loading"}
-              >
-                <RefreshCw
-                  size={13}
-                  className={matrixStatus === "loading" ? "spin" : ""}
-                />
-                {MAPS_DEMO ? "Compare 5 routes" : "Refresh routes"}
-              </button>
-            </div>
-            <div className="route-status">
-              <span
-                className={
-                  matrixStatus === "connected"
-                    ? "status-dot connected"
-                    : "status-dot"
+                  setModal("traffic");
                 }
-              />
-              {matrixStatus === "connected"
-                ? `Google Maps driving estimates · ${refreshedAt ? new Date(refreshedAt).toLocaleTimeString() : ""}`
-                : matrixStatus === "loading"
-                  ? "Comparing candidate driving routes…"
-                  : matrixStatus === "on-demand"
-                    ? "Request a comparison when needed. Demo-key usage limits apply."
-                    : matrixError ||
-                      "Live driving estimates unavailable. Illustrative model shown separately."}
-            </div>
-            <div className="comparison-table">
-              <table>
-                <thead>
-                  <tr>
-                    <th>Potential facility</th>
-                    <th>Driving ETA</th>
-                    <th>Distance</th>
-                    <th>Care status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {candidates
-                    .map((id) => facilities.find((f) => f.id === id)!)
-                    .sort(
-                      (a, b) =>
-                        (matrix.find((m) => m.facilityId === a.id)
-                          ?.durationSec ?? Infinity) -
-                        (matrix.find((m) => m.facilityId === b.id)
-                          ?.durationSec ?? Infinity),
-                    )
-                    .map((f) => {
-                      const m = matrix.find((m) => m.facilityId === f.id);
-                      return (
-                        <tr key={f.id} onClick={() => select(f)}>
-                          <td>
-                            <button onClick={() => select(f)}>
-                              {f.name}
-                              <ArrowUpRight size={11} />
-                            </button>
-                          </td>
-                          <td>
-                            {m?.durationSec !== null &&
-                            m?.durationSec !== undefined
-                              ? `${Math.round(m.durationSec / 60)} min`
-                              : "Unavailable"}
-                          </td>
-                          <td>
-                            {m?.distanceMeters !== null &&
-                            m?.distanceMeters !== undefined
-                              ? `${(m.distanceMeters / 1000).toFixed(1)} km`
-                              : "—"}
-                          </td>
-                          <td>
-                            <span>Confirm directly</span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </table>
-            </div>
-            <p className="fine-print">
-              Candidates are chosen by geographic proximity; returned routes are
-              sorted by driving time. Rank by travel time only after suitable
-              care is established. A fast route does not confirm treatment
-              availability.
-            </p>
-          </article>
-          <article className="planner-teaser card">
-            <span className="eyebrow">ONE CROSSING. MANY CONSEQUENCES.</span>
-            <h2>
-              What changes
-              <br />
-              when the bridge slows?
-            </h2>
-            <p>
-              Test a disruption. Explore a facility upgrade. See which sample
-              communities gain or lose access.
-            </p>
-            <button className="dark-button" onClick={() => setModal("planner")}>
-              Explore the what-if
-              <ArrowUpRight size={14} />
-            </button>
-            <GitBranch className="teaser-icon" size={110} />
-          </article>
-        </section>
-        <section className="disclosure-bar">
-          <ShieldQuestion size={18} />
-          <p>
-            <strong>A planning and navigation-support prototype.</strong>{" "}
-            Clinical suitability, antivenom stock and operating capacity require
-            direct confirmation. Illustrative model times use stated
-            assumptions; Google-labelled driving estimates use provider
-            responses.
-          </p>
-          <button onClick={() => setModal("data")}>
-            Understand the data
-            <ArrowUpRight size={12} />
-          </button>
-        </section>
-      </main>
-      <footer className="site-footer">
-        <span>
-          ◈ VENOMLINK <small>Built by Muhammad Sheheryar · UVAS, Lahore</small>
-        </span>
-        <div>
-          <button onClick={() => setModal("privacy")}>Privacy</button>
-          <button onClick={() => setModal("terms")}>Terms</button>
-          <a
-            href={`${import.meta.env.BASE_URL}demo.html`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Demo video ↗
-          </a>
-          <a
-            href="https://www.figma.com/design/YW6WtWs7SMQb0aGdPstddh"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Design ↗
-          </a>
-          <a
-            href="https://github.com/shehar-e-yaar/venomlink"
-            target="_blank"
-            rel="noreferrer"
-          >
-            Source ↗
-          </a>
-        </div>
-      </footer>
+              }}
+              routing={routeStatus === "loading"}
+            />
+          )
+        }
+      />
       {notice && (
         <div className="toast" role="status">
           {notice}
@@ -1018,6 +511,7 @@ export default function App() {
         <Dialog
           title={
             {
+              routes: "Compare the way to care",
               origin: "Choose your starting point",
               traffic: "Road access intelligence",
               planner: "Infrastructure changes access.",
@@ -1031,6 +525,26 @@ export default function App() {
           }
           onClose={close}
         >
+          {modal === "routes" && (
+            <RouteComparison
+              facilities={candidates.map((id) =>
+                facilities.find((f) => f.id === id)!,
+              )}
+              items={matrix}
+              status={matrixStatus}
+              error={matrixError}
+              refreshedAt={refreshedAt}
+              onRefresh={compareRoutes}
+              onSelect={(f) => {
+                select(f);
+                setModal(null);
+                mapSection.current?.scrollIntoView({
+                  behavior: "smooth",
+                  block: "start",
+                });
+              }}
+            />
+          )}
           {modal === "origin" && (
             <>
               <p className="intro-text">
@@ -1578,6 +1092,6 @@ export default function App() {
           )}
         </Dialog>
       )}
-    </div>
+    </>
   );
 }
