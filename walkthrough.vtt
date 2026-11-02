@@ -1,0 +1,109 @@
+WEBVTT
+
+00:00:00.000 --> 00:00:03.479
+A hospital marker tells us where a building is.
+
+00:00:03.479 --> 00:00:09.665
+It does not establish suitable care, or reveal how fragile access can be across a river.
+
+00:00:09.665 --> 00:00:13.144
+This is VenomLink, a healthcare accessibility atlas for Lahore.
+
+00:00:13.144 --> 00:00:15.463
+This walkthrough uses real application screens.
+
+00:00:15.463 --> 00:00:19.716
+It is a planning prototype, with live provider setup still pending.
+
+00:00:20.516 --> 00:00:26.314
+Each independent facility record has source links, coordinates, quality, and a retrieval timestamp.
+
+00:00:26.314 --> 00:00:29.882
+Flip a card to inspect the actual record.
+
+00:00:29.882 --> 00:00:33.004
+Treatment capability and antivenom stock remain unknown.
+
+00:00:33.004 --> 00:00:36.571
+A retrieval date does not mean clinical verification.
+
+00:00:36.571 --> 00:00:41.031
+UVAS is a reference institution, excluded from human care comparisons.
+
+00:00:41.831 --> 00:00:48.399
+The planning model uses declared assumptions: geographic distance, a detour factor, assumed speed, and access overhead.
+
+00:00:48.399 --> 00:00:53.324
+At twenty minutes, four of eight sample communities meet the baseline threshold.
+
+00:00:53.324 --> 00:00:57.839
+Making Shahdara Town T H Q eligible raises this to six.
+
+00:00:57.839 --> 00:01:04.407
+That is a hypothetical eligibility change, not a claim that real antivenom or treatment capacity exists.
+
+00:01:05.207 --> 00:01:12.965
+At a thirty minute threshold, a hypothetical twenty minute crossing delay reduces sampled access from five communities to four.
+
+00:01:12.965 --> 00:01:15.823
+Only crossing dependent journeys receive the delay.
+
+00:01:15.823 --> 00:01:19.906
+A closure removes those model paths without inventing a detour.
+
+00:01:19.906 --> 00:01:22.764
+The percentages count sample communities, not population.
+
+00:01:22.764 --> 00:01:25.622
+Highlight circles are not driving time polygons.
+
+00:01:26.422 --> 00:01:33.035
+The implemented A W S backend uses Amazon Location Search Nearby and Search Text through Lambda.
+
+00:01:33.035 --> 00:01:36.341
+Discovery finds geographic candidates, not confirmed medical care.
+
+00:01:36.341 --> 00:01:39.234
+Results stay in an attributed discovery list.
+
+00:01:39.234 --> 00:01:46.673
+Our account setup is pending, so the current app reports not connected, rather than substituting invented search results.
+
+00:01:47.473 --> 00:01:53.178
+Independent public records pass through Python validation and are prepared for private S three delivery.
+
+00:01:53.178 --> 00:01:55.840
+The current demo uses its bundled snapshot.
+
+00:01:55.840 --> 00:02:00.404
+Optional Glue, Iceberg, and Athena scripts are included, but are not deployed.
+
+00:02:00.404 --> 00:02:04.969
+Provider search and route content are kept separate from the independent dataset.
+
+00:02:05.769 --> 00:02:11.940
+Google Maps and Traffic Layer are implemented with a protected Routes backend for actual driving estimates.
+
+00:02:11.940 --> 00:02:15.411
+They still need a billing enabled project and credentials.
+
+00:02:15.411 --> 00:02:19.269
+Traffic colors appear only when provider speed intervals are returned.
+
+00:02:19.269 --> 00:02:21.969
+Google route geometry belongs on Google Maps.
+
+00:02:21.969 --> 00:02:25.054
+Model values remain clearly separate from live estimates.
+
+00:02:25.854 --> 00:02:31.140
+The optional photo helper shows four labeled illustrations and a local image preview.
+
+00:02:31.140 --> 00:02:35.207
+No trained classifier is connected, and no identification is invented.
+
+00:02:35.207 --> 00:02:40.493
+VenomLink makes geographic access, its assumptions, and the evidence behind each point visible.
+
+00:02:40.493 --> 00:02:44.965
+The next step is live provider verification and real healthcare partnerships.
