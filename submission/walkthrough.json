@@ -1,0 +1,50 @@
+[
+  {
+    "image": "desktop.png",
+    "title": "When nearby care is still hard to reach",
+    "caption": "Lahore · independent facility geography · explicit uncertainty",
+    "speech": "A hospital marker tells us where a building is. It does not establish suitable care, or reveal how fragile access can be across a river. This is VenomLink, a healthcare accessibility atlas for Lahore. This walkthrough uses real application screens. It is a planning prototype, with live provider setup still pending."
+  },
+  {
+    "image": "lineage.png",
+    "title": "Inspect the evidence behind each point",
+    "caption": "10 hospital candidates + 1 reference institution · no verified stock",
+    "speech": "Each independent facility record has source links, coordinates, quality, and a retrieval timestamp. Flip a card to inspect the actual record. Treatment capability and antivenom stock remain unknown. A retrieval date does not mean clinical verification. UVAS is a reference institution, excluded from human care comparisons."
+  },
+  {
+    "image": "planner.png",
+    "title": "A local capability change can alter geographic access",
+    "caption": "20-minute model: 4/8 → 6/8 sample communities · hypothetical THQ eligibility",
+    "speech": "The planning model uses declared assumptions: geographic distance, a detour factor, assumed speed, and access overhead. At twenty minutes, four of eight sample communities meet the baseline threshold. Making Shahdara Town T H Q eligible raises this to six. That is a hypothetical eligibility change, not a claim that real antivenom or treatment capacity exists."
+  },
+  {
+    "image": "delay.png",
+    "title": "One crossing. Different consequences.",
+    "caption": "30-minute model: 5/8 → 4/8 after hypothetical crossing delay",
+    "speech": "At a thirty minute threshold, a hypothetical twenty minute crossing delay reduces sampled access from five communities to four. Only crossing dependent journeys receive the delay. A closure removes those model paths without inventing a detour. The percentages count sample communities, not population. Highlight circles are not driving time polygons."
+  },
+  {
+    "image": "aws.png",
+    "title": "AWS discovery has an honest connection state",
+    "caption": "SearchNearby / SearchText backend implemented · awaiting account setup",
+    "speech": "The implemented A W S backend uses Amazon Location Search Nearby and Search Text through Lambda. Discovery finds geographic candidates, not confirmed medical care. Results stay in an attributed discovery list. Our account setup is pending, so the current app reports not connected, rather than substituting invented search results."
+  },
+  {
+    "image": "architecture.png",
+    "title": "Independent data has its own lifecycle",
+    "caption": "Private S3 deployment + optional Iceberg/Athena pipeline supplied",
+    "speech": "Independent public records pass through Python validation and are prepared for private S three delivery. The current demo uses its bundled snapshot. Optional Glue, Iceberg, and Athena scripts are included, but are not deployed. Provider search and route content are kept separate from the independent dataset."
+  },
+  {
+    "image": "traffic.png",
+    "title": "Route estimates stay separate from planning assumptions",
+    "caption": "Google Maps / Routes integration implemented · not verified live",
+    "speech": "Google Maps and Traffic Layer are implemented with a protected Routes backend for actual driving estimates. They still need a billing enabled project and credentials. Traffic colors appear only when provider speed intervals are returned. Google route geometry belongs on Google Maps. Model values remain clearly separate from live estimates."
+  },
+  {
+    "image": "photo.png",
+    "title": "A photograph must never delay finding care",
+    "caption": "Illustrated profiles and local preview · no trained classifier connected",
+    "speech": "The optional photo helper shows four labeled illustrations and a local image preview. No trained classifier is connected, and no identification is invented. VenomLink makes geographic access, its assumptions, and the evidence behind each point visible. The next step is live provider verification and real healthcare partnerships."
+  }
+]

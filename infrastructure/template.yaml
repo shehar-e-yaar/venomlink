@@ -1,0 +1,89 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: AWS::Serverless-2016-10-31
+Description: VenomLink independent data and ephemeral geographic discovery API
+Parameters:
+  FrontendOrigin:
+    Type: String
+    Description: Exact HTTPS frontend origin, without path or trailing slash
+  GoogleRoutesSecretArn:
+    Type: String
+    Default: ""
+    Description: ARN of an existing Secrets Manager secret containing apiKey (optional)
+Conditions:
+  HasGoogleSecret: !Not [!Equals [!Ref GoogleRoutesSecretArn, ""]]
+Resources:
+  DataBucket:
+    Type: AWS::S3::Bucket
+    DeletionPolicy: Retain
+    UpdateReplacePolicy: Retain
+    Properties:
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: true
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: true
+      VersioningConfiguration:
+        Status: Enabled
+      BucketEncryption:
+        ServerSideEncryptionConfiguration:
+          - ServerSideEncryptionByDefault:
+              SSEAlgorithm: AES256
+  Api:
+    Type: AWS::Serverless::HttpApi
+    Properties:
+      CorsConfiguration:
+        AllowOrigins: [!Ref FrontendOrigin]
+        AllowHeaders: [Content-Type]
+        AllowMethods: [GET, POST, OPTIONS]
+      DefaultRouteSettings:
+        ThrottlingBurstLimit: 5
+        ThrottlingRateLimit: 2
+  ApiLogGroup:
+    Type: AWS::Logs::LogGroup
+    Properties:
+      LogGroupName: !Sub /aws/lambda/${ApiFunction}
+      RetentionInDays: 7
+  ApiFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Runtime: nodejs22.x
+      Handler: handler.handler
+      CodeUri: ../build/
+      MemorySize: 256
+      Timeout: 25
+      ReservedConcurrentExecutions: 3
+      Environment:
+        Variables:
+          DATA_BUCKET: !Ref DataBucket
+          ALLOWED_ORIGIN: !Ref FrontendOrigin
+          GOOGLE_ROUTES_SECRET_ARN: !Ref GoogleRoutesSecretArn
+          AWS_PLACES_ATTRIBUTION: "Amazon Location Service · © HERE"
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action: [geo-places:SearchNearby, geo-places:SearchText]
+              Resource: !Sub arn:${AWS::Partition}:geo-places:${AWS::Region}::provider/default
+            - Effect: Allow
+              Action: [s3:GetObject]
+              Resource:
+                - !Sub ${DataBucket.Arn}/validated/facilities.json
+                - !Sub ${DataBucket.Arn}/planning/communities.json
+            - !If
+              - HasGoogleSecret
+              - Effect: Allow
+                Action: [secretsmanager:GetSecretValue]
+                Resource: !Ref GoogleRoutesSecretArn
+              - !Ref AWS::NoValue
+      Events:
+        Proxy:
+          Type: HttpApi
+          Properties:
+            ApiId: !Ref Api
+            Path: /api/{proxy+}
+            Method: ANY
+Outputs:
+  ApiBaseUrl:
+    Value: !Sub https://${Api}.execute-api.${AWS::Region}.amazonaws.com/api
+  IndependentDataBucket:
+    Value: !Ref DataBucket

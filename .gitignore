@@ -1,0 +1,13 @@
+node_modules/
+dist/
+build/
+.env
+.env.local
+*.tsbuildinfo
+__pycache__/
+.deploy/
+*.log
+
+.tools/
+submission/video-work/
+public/venomlink-walkthrough.mp4
