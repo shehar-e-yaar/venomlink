@@ -290,9 +290,6 @@ export function ProductExperience(p: Props) {
               <br />A closer look.
             </h2>
             <p>Explore a possible species, then find care.</p>
-            <span className="model-badge">
-              498 species / runs on your device
-            </span>
           </Reveal>
           <div className="snake-id-tool glass-panel">
             <SnakePhotoAssistant />
@@ -397,10 +394,6 @@ export function ProductExperience(p: Props) {
               </Reveal>
             ))}
           </div>
-          <p className="dataset-caption">
-            Current dataset: independent care locations in Lahore.
-            Snake-sighting records are a future layer.
-          </p>
         </section>
         <section
           className="atlas-section"
