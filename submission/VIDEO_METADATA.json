@@ -1,8 +1,9 @@
 {
-  "type": "Narrated walkthrough using actual browser screenshots; not continuous screen recording",
-  "durationSeconds": 122.81,
-  "width": 1600,
-  "height": 1200,
-  "providerStatus": "Verified AWS S3 and Places, Google Maps Demo Key and Compute Routes; evaluation prototype, no paid billing",
-  "narration": "Windows Microsoft Zira synthetic narration"
+  "type": "Fresh current-website screenshot walkthrough with synthetic male narration",
+  "durationSeconds": 116.17,
+  "width": 1280,
+  "height": 720,
+  "voice": "en-US-AndrewNeural",
+  "transcript": "new-demo-scenes.json",
+  "routingStatus": "Demo quota reached during this capture; directions fallback shown"
 }

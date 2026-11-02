@@ -1,0 +1,42 @@
+[
+  {
+    "image": "new-hero.png",
+    "title": "Snakebite care, mapped.",
+    "speech": "Meet VenomLink. A geospatial prototype for Lahore that connects snake species suggestions, hospital locations, and road access in one clean interface."
+  },
+  {
+    "image": "new-photo.png",
+    "title": "Start with a photograph.",
+    "speech": "The experience starts with a snake photo. Choose an image from your device. The photo stays in your browser, and the app uses your trained species classifier rather than the separate snake-location detector."
+  },
+  {
+    "image": "new-classified.png",
+    "title": "Real inference. On your device.",
+    "speech": "Select Identify species. ONNX Runtime Web runs the exported model locally and returns possible species matches with model scores. These are suggestions, not proof of venom or safety. Never approach or handle a snake to take a photo."
+  },
+  {
+    "image": "new-vision.png",
+    "title": "Every point. A clearer picture.",
+    "speech": "The new design gives the snake center stage, with a transparent glass aesthetic, a floating navigation bar, and a direct path into the map."
+  },
+  {
+    "image": "new-pipeline.png",
+    "title": "Source. Validate. Explore.",
+    "speech": "The three-step pipeline makes the data journey visible. Public facility records are checked with Python, stored in Amazon S three, and delivered through API Gateway and Lambda. Amazon Location Service adds place discovery."
+  },
+  {
+    "image": "new-atlas.png",
+    "title": "Welcome to Venomap.",
+    "speech": "Venomap brings the hospital directory onto Google Maps. Choose a starting point, inspect hospital markers, and explore the locations around Lahore. User-listed antivenom leads are distinguished from other hospitals and reference institutions."
+  },
+  {
+    "image": "new-map.png",
+    "title": "Road context, with clear limits.",
+    "speech": "Route comparison is designed to rank returned Google driving estimates by travel time, then distance. In this fresh capture, the Google demo quota has been reached, so the app clearly shows that live routing is unavailable and offers Google Maps directions. It does not invent a live travel time."
+  },
+  {
+    "image": "new-map.png",
+    "title": "Explore the evidence.",
+    "speech": "The displayed ten injections per hospital are simulated demo inventory. Real antivenom stock and treatment capability need hospital confirmation. VenomLink combines React, TypeScript, on-device machine learning, and an AWS data pipeline to make snakebite care geography easier to explore. Try the live app and inspect the public code."
+  }
+]
