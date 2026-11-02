@@ -9,8 +9,20 @@ Parameters:
     Type: String
     Default: ""
     Description: ARN of an existing Secrets Manager secret containing apiKey (optional)
+  GoogleMapsDemoMode:
+    Type: String
+    AllowedValues: ["true", "false"]
+    Default: "false"
+    Description: Use up to five supported computeRoutes calls for on-demand comparisons; no billing-enabled matrix API
+  ReservedFunctionConcurrency:
+    Type: Number
+    Default: 0
+    MinValue: 0
+    Description: Optional reserved concurrency; 0 omits reservation for accounts with small initial limits
 Conditions:
   HasGoogleSecret: !Not [!Equals [!Ref GoogleRoutesSecretArn, ""]]
+  HasConcurrencyReservation:
+    !Not [!Equals [!Ref ReservedFunctionConcurrency, "0"]]
 Resources:
   DataBucket:
     Type: AWS::S3::Bucket
@@ -32,7 +44,12 @@ Resources:
     Type: AWS::Serverless::HttpApi
     Properties:
       CorsConfiguration:
-        AllowOrigins: [!Ref FrontendOrigin]
+        AllowOrigins:
+          [
+            !Ref FrontendOrigin,
+            "http://127.0.0.1:5190",
+            "http://localhost:5190",
+          ]
         AllowHeaders: [Content-Type]
         AllowMethods: [GET, POST, OPTIONS]
       DefaultRouteSettings:
@@ -51,12 +68,18 @@ Resources:
       CodeUri: ../build/
       MemorySize: 256
       Timeout: 25
-      ReservedConcurrentExecutions: 3
+      ReservedConcurrentExecutions:
+        !If [
+          HasConcurrencyReservation,
+          !Ref ReservedFunctionConcurrency,
+          !Ref AWS::NoValue,
+        ]
       Environment:
         Variables:
           DATA_BUCKET: !Ref DataBucket
           ALLOWED_ORIGIN: !Ref FrontendOrigin
           GOOGLE_ROUTES_SECRET_ARN: !Ref GoogleRoutesSecretArn
+          GOOGLE_MAPS_DEMO_MODE: !Ref GoogleMapsDemoMode
           AWS_PLACES_ATTRIBUTION: "Amazon Location Service · © HERE"
       Policies:
         - Version: "2012-10-17"

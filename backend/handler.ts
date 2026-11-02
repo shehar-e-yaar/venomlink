@@ -9,6 +9,7 @@ import {
   GetSecretValueCommand,
 } from "@aws-sdk/client-secrets-manager";
 import { coordinates, radius, parseMatrix, seconds } from "./shared";
+import { compareWithRoutes } from "./routeComparison";
 import type { Facility, LatLng } from "../src/types";
 const region = process.env.AWS_REGION || "ap-south-1";
 const places = new GeoPlacesClient({ region }),
@@ -49,9 +50,13 @@ async function key() {
   }
   return googleKey;
 }
-async function google(method: string, body: unknown, mask: string) {
+async function google(
+  method: "computeRoutes" | "computeRouteMatrix",
+  body: unknown,
+  mask: string,
+) {
   const r = await fetch(
-    `https://routes.googleapis.com/directions/v2:${method}`,
+    `https://routes.googleapis.com/${method === "computeRouteMatrix" ? "distanceMatrix" : "directions"}/v2:${method}`,
     {
       method: "POST",
       headers: {
@@ -80,10 +85,16 @@ const waypoint = (p: LatLng) => ({
 export async function handler(event: Event) {
   const origin = event.headers?.origin || event.headers?.Origin;
   const allowed = process.env.ALLOWED_ORIGIN || "http://localhost:5190";
+  const allowedOrigins = [
+    allowed,
+    "http://localhost:5190",
+    "http://127.0.0.1:5190",
+  ];
   const headers = {
     "content-type": "application/json",
     "cache-control": "no-store",
-    "access-control-allow-origin": allowed,
+    "access-control-allow-origin":
+      origin && allowedOrigins.includes(origin) ? origin : allowed,
     "access-control-allow-headers": "Content-Type",
     "access-control-allow-methods": "GET,POST,OPTIONS",
     vary: "Origin",
@@ -93,7 +104,7 @@ export async function handler(event: Event) {
     headers,
     body: JSON.stringify(body),
   });
-  if (origin && origin !== allowed)
+  if (origin && !allowedOrigins.includes(origin))
     return respond(403, { error: "Origin is not allowed" });
   if (event.requestContext?.http?.method === "OPTIONS") return respond(204, {});
   try {
@@ -104,6 +115,7 @@ export async function handler(event: Event) {
         aws: "configured",
         s3: !!process.env.DATA_BUCKET,
         googleRoutes: !!process.env.GOOGLE_ROUTES_SECRET_ARN,
+        googleDemoMode: process.env.GOOGLE_MAPS_DEMO_MODE === "true",
       });
     if (path === "/facilities")
       return respond(200, {
@@ -127,7 +139,11 @@ export async function handler(event: Event) {
                 QueryRadius: r,
                 MaxResults: 20,
                 Filter: {
-                  IncludeCategories: ["hospital_or_health_care_facility"],
+                  IncludeCategories: [
+                    "hospital",
+                    "hospital_emergency_room",
+                    "hospital_or_health_care_facility",
+                  ],
                   IncludeCountries: ["PAK"],
                 },
                 IntendedUse: "SingleUse",
@@ -150,6 +166,7 @@ export async function handler(event: Event) {
           id: v.PlaceId,
           title: v.Title,
           position: v.Position,
+          placeType: v.PlaceType,
           categories: (v.Categories || []).map((c) => c.Name || c.Id),
           attribution:
             process.env.AWS_PLACES_ATTRIBUTION ||
@@ -189,6 +206,26 @@ export async function handler(event: Event) {
         );
         if (selected.some((f: Facility | undefined) => !f))
           throw new Error("Unknown facility");
+        if (process.env.GOOGLE_MAPS_DEMO_MODE === "true") {
+          const items = await compareWithRoutes(selected as Facility[], (f) =>
+            google(
+              "computeRoutes",
+              {
+                origin: waypoint(o),
+                destination: waypoint(f),
+                travelMode: "DRIVE",
+                routingPreference: "TRAFFIC_AWARE",
+              },
+              "routes.duration,routes.staticDuration,routes.distanceMeters",
+            ),
+          );
+          return respond(200, {
+            items,
+            calculatedAt: new Date().toISOString(),
+            provider: "Google Maps",
+            method: "computeRoutes · on-demand comparison · Maps Demo Key",
+          });
+        }
         const d = await google(
           "computeRouteMatrix",
           {
@@ -225,6 +262,9 @@ export async function handler(event: Event) {
       if (
         !route ||
         seconds(route.duration) === null ||
+        !Number.isFinite(seconds(route.duration)) ||
+        !Number.isFinite(route.distanceMeters) ||
+        route.distanceMeters < 0 ||
         !route.polyline?.encodedPolyline
       )
         throw new Error("No usable route returned");
@@ -241,6 +281,11 @@ export async function handler(event: Event) {
     return respond(404, { error: "Endpoint not found" });
   } catch (error) {
     const message = (error as Error).message;
+    if (message === "Routing quota reached")
+      return respond(429, {
+        error:
+          "Maps request quota reached. Try later; demo limits reset automatically.",
+      });
     const invalid = /coordinates|Radius|Select |Unknown facility|JSON/.test(
       message,
     );

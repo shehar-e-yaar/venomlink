@@ -82,6 +82,7 @@ export type DiscoveredPlace = {
   id: string;
   title: string;
   position: [number, number];
+  placeType?: string;
   categories: string[];
   attribution: string;
   matchedFacilityId?: string;

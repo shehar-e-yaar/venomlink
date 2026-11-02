@@ -47,6 +47,7 @@ import {
 import {
   API,
   MAPS_KEY,
+  MAPS_DEMO,
   REFRESH_MS,
   discover,
   getFacilities,
@@ -106,6 +107,7 @@ export default function App() {
     [routeError, setRouteError] = useState(""),
     [refreshedAt, setRefreshedAt] = useState<string | null>(null),
     [refreshNonce, setRefreshNonce] = useState(0),
+    [matrixNonce, setMatrixNonce] = useState(0),
     [awsStatus, setAwsStatus] = useState("unavailable"),
     [awsPlaces, setAwsPlaces] = useState<DiscoveredPlace[]>([]),
     [awsError, setAwsError] = useState(""),
@@ -159,6 +161,7 @@ export default function App() {
   }, []);
   const chooseOrigin = (o: Origin) => {
     setOrigin(o);
+    setMatrixNonce(0);
     setFocusToken((t) => t + 1);
     setModal(null);
     setRoute(null);
@@ -199,14 +202,21 @@ export default function App() {
   const candidates = useMemo(() => {
     const hospitals = facilities.filter((f) => f.kind === "human-hospital");
     const confirmed = hospitals.filter((f) => f.clinicalStatus === "confirmed");
-    return (confirmed.length ? confirmed : hospitals).map((f) => f.id);
-  }, [dataset]);
+    return [...(confirmed.length ? confirmed : hospitals)]
+      .sort((a, b) => haversine(origin, a) - haversine(origin, b))
+      .slice(0, MAPS_DEMO ? 5 : 12)
+      .map((f) => f.id);
+  }, [dataset, origin]);
   useEffect(() => {
     const c = new AbortController();
     setMatrix([]);
     setMatrixError("");
     if (!API || mapMode !== "google" || !candidates.length) {
       setMatrixStatus("unavailable");
+      return;
+    }
+    if (MAPS_DEMO && matrixNonce === 0) {
+      setMatrixStatus("on-demand");
       return;
     }
     const timer = setTimeout(async () => {
@@ -216,7 +226,13 @@ export default function App() {
         if (!c.signal.aborted) {
           setMatrix(d.items);
           setRefreshedAt(d.calculatedAt);
-          setMatrixStatus("connected");
+          const usable = d.items.some((i) => i.durationSec !== null);
+          setMatrixStatus(usable ? "connected" : "error");
+          if (!usable)
+            setMatrixError(
+              d.items.find((i) => i.error)?.error ||
+                "No driving estimates returned. Try later.",
+            );
         }
       } catch (e) {
         if (!c.signal.aborted) {
@@ -229,7 +245,7 @@ export default function App() {
       clearTimeout(timer);
       c.abort();
     };
-  }, [origin, candidates, mapMode, refreshNonce]);
+  }, [origin, candidates, mapMode, MAPS_DEMO ? matrixNonce : refreshNonce]);
   useEffect(() => {
     const c = new AbortController();
     setRoute(null);
@@ -339,6 +355,7 @@ export default function App() {
     setDirectoryQuery("");
     setSelectedId(null);
     setOrigin(communities[0]);
+    setMatrixNonce(0);
     setFocusToken((t) => t + 1);
     setRoute(null);
   };
@@ -464,7 +481,9 @@ export default function App() {
             />
             {awsStatus === "connected"
               ? "AWS discovery connected"
-              : "Demo Mode"}
+              : MAPS_DEMO
+                ? "Prototype · Maps Demo Key"
+                : "Demo Mode"}
             <button
               onClick={() => setModal("architecture")}
               aria-label="View connection details"
@@ -833,7 +852,8 @@ export default function App() {
               <button
                 className="outline-button"
                 onClick={() => {
-                  setRefreshNonce((n) => n + 1);
+                  setMatrixNonce((n) => n + 1);
+                  if (!MAPS_DEMO) setRefreshNonce((n) => n + 1);
                   if (!API || mapMode !== "google") setModal("traffic");
                 }}
                 disabled={matrixStatus === "loading"}
@@ -842,7 +862,7 @@ export default function App() {
                   size={13}
                   className={matrixStatus === "loading" ? "spin" : ""}
                 />
-                Refresh routes
+                {MAPS_DEMO ? "Compare 5 routes" : "Refresh routes"}
               </button>
             </div>
             <div className="route-status">
@@ -857,8 +877,10 @@ export default function App() {
                 ? `Google Maps driving estimates · ${refreshedAt ? new Date(refreshedAt).toLocaleTimeString() : ""}`
                 : matrixStatus === "loading"
                   ? "Comparing candidate driving routes…"
-                  : matrixError ||
-                    "Live driving estimates unavailable. Illustrative model shown separately."}
+                  : matrixStatus === "on-demand"
+                    ? "Request a comparison when needed. Demo-key usage limits apply."
+                    : matrixError ||
+                      "Live driving estimates unavailable. Illustrative model shown separately."}
             </div>
             <div className="comparison-table">
               <table>
@@ -871,9 +893,15 @@ export default function App() {
                   </tr>
                 </thead>
                 <tbody>
-                  {facilities
-                    .filter((f) => f.kind === "human-hospital")
-                    .slice(0, 5)
+                  {candidates
+                    .map((id) => facilities.find((f) => f.id === id)!)
+                    .sort(
+                      (a, b) =>
+                        (matrix.find((m) => m.facilityId === a.id)
+                          ?.durationSec ?? Infinity) -
+                        (matrix.find((m) => m.facilityId === b.id)
+                          ?.durationSec ?? Infinity),
+                    )
                     .map((f) => {
                       const m = matrix.find((m) => m.facilityId === f.id);
                       return (
@@ -906,8 +934,10 @@ export default function App() {
               </table>
             </div>
             <p className="fine-print">
-              Rank by travel time only after suitable care is established. A
-              fast route does not confirm treatment availability.
+              Candidates are chosen by geographic proximity; returned routes are
+              sorted by driving time. Rank by travel time only after suitable
+              care is established. A fast route does not confirm treatment
+              availability.
             </p>
           </article>
           <article className="planner-teaser card">
@@ -933,8 +963,9 @@ export default function App() {
           <p>
             <strong>A planning and navigation-support prototype.</strong>{" "}
             Clinical suitability, antivenom stock and operating capacity require
-            direct confirmation. Demo paths and times are assumptions, not live
-            routes.
+            direct confirmation. Illustrative model times use stated
+            assumptions; Google-labelled driving estimates use provider
+            responses.
           </p>
           <button onClick={() => setModal("data")}>
             Understand the data
@@ -1203,6 +1234,13 @@ export default function App() {
                 Google Routes API supplies programmatic route estimates and
                 speed intervals when returned.
               </p>
+              {MAPS_DEMO && (
+                <p className="notice">
+                  This is quota-limited prototype access. Comparisons are
+                  requested on demand; the provider pauses requests when its
+                  demo limit is reached.
+                </p>
+              )}
               <div className="provider-status-grid">
                 <div>
                   <span>Map canvas</span>
@@ -1403,7 +1441,7 @@ export default function App() {
                   {
                     icon: Navigation,
                     title: "Google traffic & routes",
-                    body: "Google Maps JavaScript + TrafficLayer. A Secrets Manager-backed Lambda proxy calls computeRoutes and computeRouteMatrix.",
+                    body: "Google Maps JavaScript + TrafficLayer. A Secrets Manager-backed Lambda proxy calls Compute Routes. Demo-key comparisons use up to five supported route calls on demand; the billing-only matrix API is not used.",
                   },
                   {
                     icon: GitBranch,

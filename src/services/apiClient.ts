@@ -7,6 +7,7 @@ import type {
 } from "../types";
 export const API = import.meta.env.VITE_API_BASE_URL?.replace(/\/$/, "") || "";
 export const MAPS_KEY = import.meta.env.VITE_GOOGLE_MAPS_BROWSER_KEY || "";
+export const MAPS_DEMO = import.meta.env.VITE_GOOGLE_MAPS_DEMO_MODE === "true";
 export const REFRESH_MS = Math.max(
   60000,
   Number(import.meta.env.VITE_ROUTE_REFRESH_MS) || 300000,
@@ -57,7 +58,7 @@ export const routeMatrix = (
   facilityIds: string[],
   signal?: AbortSignal,
 ) =>
-  request<{ items: MatrixItem[]; calculatedAt: string }>(
+  request<{ items: MatrixItem[]; calculatedAt: string; method?: string }>(
     "/routes/matrix",
     {
       method: "POST",

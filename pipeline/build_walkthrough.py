@@ -26,5 +26,5 @@ for i,s in enumerate(segments):
 assert total<180,f'Video exceeds limit: {total}'
 (work/'concat.txt').write_text('\n'.join(f"file '{i:02}.mp4'" for i in range(len(segments))),encoding='utf-8')
 subprocess.run([ff,'-y','-loglevel','error','-f','concat','-safe','0','-i',str(work/'concat.txt'),'-c','copy','-movflags','+faststart',str(root/'venomlink-walkthrough.mp4')],check=True)
-(root/'VIDEO_METADATA.json').write_text(json.dumps({'type':'Narrated walkthrough using actual browser screenshots; not continuous screen recording','durationSeconds':round(total,2),'width':1600,'height':1200,'providerStatus':'Unconfigured demo; no live AWS or Google results claimed','narration':'Windows Microsoft Zira synthetic narration'},indent=2),encoding='utf-8')
+(root/'VIDEO_METADATA.json').write_text(json.dumps({'type':'Narrated walkthrough using actual browser screenshots; not continuous screen recording','durationSeconds':round(total,2),'width':1600,'height':1200,'providerStatus':'Verified AWS S3 and Places, Google Maps Demo Key and Compute Routes; evaluation prototype, no paid billing','narration':'Windows Microsoft Zira synthetic narration'},indent=2),encoding='utf-8')
 print(json.dumps({'durationSeconds':total,'file':str(root/'venomlink-walkthrough.mp4')}))

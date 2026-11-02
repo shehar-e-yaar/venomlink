@@ -1,50 +1,50 @@
 [
   {
     "image": "desktop.png",
-    "title": "When nearby care is still hard to reach",
-    "caption": "Lahore · independent facility geography · explicit uncertainty",
-    "speech": "A hospital marker tells us where a building is. It does not establish suitable care, or reveal how fragile access can be across a river. This is VenomLink, a healthcare accessibility atlas for Lahore. This walkthrough uses real application screens. It is a planning prototype, with live provider setup still pending."
+    "title": "VenomLink: when nearby care is hard to reach",
+    "caption": "Lahore · real Google map and routes · independent facility evidence",
+    "speech": "A hospital marker tells us where a building is. It does not establish suitable care or reveal fragile access across a river. VenomLink connects geographic evidence, real driving estimates, and infrastructure scenarios in Lahore. This is a working hackathon prototype, shown through actual application screenshots."
   },
   {
     "image": "lineage.png",
     "title": "Inspect the evidence behind each point",
-    "caption": "10 hospital candidates + 1 reference institution · no verified stock",
-    "speech": "Each independent facility record has source links, coordinates, quality, and a retrieval timestamp. Flip a card to inspect the actual record. Treatment capability and antivenom stock remain unknown. A retrieval date does not mean clinical verification. UVAS is a reference institution, excluded from human care comparisons."
+    "caption": "11 independent records served from private Amazon S3",
+    "speech": "Each independent facility record has coordinates, source links, quality, and a retrieval timestamp. Flip a card to inspect the actual record, served through the deployed private S three data path. Treatment capability and antivenom stock remain unknown. A retrieval date does not mean clinical verification."
   },
   {
     "image": "planner.png",
-    "title": "A local capability change can alter geographic access",
-    "caption": "20-minute model: 4/8 → 6/8 sample communities · hypothetical THQ eligibility",
-    "speech": "The planning model uses declared assumptions: geographic distance, a detour factor, assumed speed, and access overhead. At twenty minutes, four of eight sample communities meet the baseline threshold. Making Shahdara Town T H Q eligible raises this to six. That is a hypothetical eligibility change, not a claim that real antivenom or treatment capacity exists."
+    "title": "A hypothetical local upgrade changes access",
+    "caption": "20-minute model: 4/8 to 6/8 sampled communities",
+    "speech": "The separate planning model uses explicit assumptions about distance, speed and access overhead. At twenty minutes, four of eight sample communities meet the baseline threshold. Making Shahdara Town T H Q eligible raises that to six. This is a hypothetical planning change, not a real treatment or stock claim."
   },
   {
     "image": "delay.png",
     "title": "One crossing. Different consequences.",
-    "caption": "30-minute model: 5/8 → 4/8 after hypothetical crossing delay",
-    "speech": "At a thirty minute threshold, a hypothetical twenty minute crossing delay reduces sampled access from five communities to four. Only crossing dependent journeys receive the delay. A closure removes those model paths without inventing a detour. The percentages count sample communities, not population. Highlight circles are not driving time polygons."
+    "caption": "30-minute model: 5/8 to 4/8 after a hypothetical crossing delay",
+    "speech": "At thirty minutes, a hypothetical crossing delay reduces sampled access from five communities to four. Only crossing dependent journeys receive that delay. Closure removes those model connections without inventing a detour. These percentages count sample communities, not population. The scenarios do not change Google's reported road conditions."
   },
   {
     "image": "aws.png",
-    "title": "AWS discovery has an honest connection state",
-    "caption": "SearchNearby / SearchText backend implemented · awaiting account setup",
-    "speech": "The implemented A W S backend uses Amazon Location Search Nearby and Search Text through Lambda. Discovery finds geographic candidates, not confirmed medical care. Results stay in an attributed discovery list. Our account setup is pending, so the current app reports not connected, rather than substituting invented search results."
+    "title": "AWS discovery preserves the coverage gap",
+    "caption": "Real Amazon Location SearchText response · locality, not medical care",
+    "speech": "Amazon Location Search Nearby and Search Text run through A W S Lambda. Hospital category searches returned no matches in our tests. An area search returned the actual Shahdara locality, clearly labeled as a geographic reference. Zero matches do not establish that hospitals are absent, and a locality is not medical care."
   },
   {
     "image": "architecture.png",
-    "title": "Independent data has its own lifecycle",
-    "caption": "Private S3 deployment + optional Iceberg/Athena pipeline supplied",
-    "speech": "Independent public records pass through Python validation and are prepared for private S three delivery. The current demo uses its bundled snapshot. Optional Glue, Iceberg, and Athena scripts are included, but are not deployed. Provider search and route content are kept separate from the independent dataset."
+    "title": "Clear service boundaries and real delivery",
+    "caption": "API Gateway + Lambda + S3 + Amazon Location + Secrets Manager",
+    "speech": "Python validation prepares independent public facts for private S three delivery. Provider discovery stays in an attributed, temporary list. Google geometry stays on Google Maps. The backend route credential is stored in Secrets Manager. Optional Iceberg and Athena scripts are included, but those analytics extensions are not deployed."
   },
   {
     "image": "traffic.png",
-    "title": "Route estimates stay separate from planning assumptions",
-    "caption": "Google Maps / Routes integration implemented · not verified live",
-    "speech": "Google Maps and Traffic Layer are implemented with a protected Routes backend for actual driving estimates. They still need a billing enabled project and credentials. Traffic colors appear only when provider speed intervals are returned. Google route geometry belongs on Google Maps. Model values remain clearly separate from live estimates."
+    "title": "Real routes without activating paid Google billing",
+    "caption": "Maps Demo Key · traffic-aware Compute Routes · on-demand comparisons",
+    "speech": "The no billing Google Maps Demo Key renders the map and supports Compute Routes. The protected backend returns actual driving estimates and traffic speed intervals. An on demand comparison uses up to five supported route calls, avoiding the billing only matrix method. Provider limits can pause this prototype. Driving estimates are not ambulance response times."
   },
   {
     "image": "photo.png",
     "title": "A photograph must never delay finding care",
-    "caption": "Illustrated profiles and local preview · no trained classifier connected",
-    "speech": "The optional photo helper shows four labeled illustrations and a local image preview. No trained classifier is connected, and no identification is invented. VenomLink makes geographic access, its assumptions, and the evidence behind each point visible. The next step is live provider verification and real healthcare partnerships."
+    "caption": "Illustrations and local preview · no trained classifier connected",
+    "speech": "The optional photo helper contains labeled illustrations and a local image preview. No trained classifier is connected, and no identification is invented. VenomLink makes geographic access, its assumptions, and each point's evidence inspectable. Real healthcare partnerships and verified clinical data remain essential before any operational care use."
   }
 ]

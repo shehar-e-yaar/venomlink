@@ -1,4 +1,6 @@
 node_modules/
+.venv/
+.aws-sam/
 dist/
 build/
 .env

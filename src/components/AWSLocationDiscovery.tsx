@@ -27,6 +27,8 @@ export function AWSLocationDiscovery({
   const match = (p: DiscoveredPlace) =>
     facilities.find(
       (f) =>
+        p.placeType === "PointOfInterest" &&
+        f.kind === "human-hospital" &&
         haversine(f, { lng: p.position[0], lat: p.position[1] }) < 0.5 &&
         f.name
           .toLowerCase()
@@ -82,10 +84,18 @@ export function AWSLocationDiscovery({
         {status === "connected"
           ? `${places.length} real AWS result${places.length === 1 ? "" : "s"} · ${searchedAt ? new Date(searchedAt).toLocaleTimeString() : ""}`
           : status === "searching"
-            ? "Calling AWS Lambda → SearchNearby…"
+            ? "Calling Amazon Location…"
             : error ||
               "AWS backend not connected. No AWS results have been generated."}
       </div>
+      {status === "connected" && !places.length && (
+        <p className="safety-note">
+          AWS returned no matches for this query. This is a provider coverage
+          result, not evidence that hospitals are absent. The independent
+          facility directory remains available. Try an area name such as
+          Shahdara with SearchText.
+        </p>
+      )}
       <form
         className="aws-text-search"
         onSubmit={(e) => {
@@ -117,7 +127,9 @@ export function AWSLocationDiscovery({
               <p>{p.categories.join(" · ") || "Category not returned"}</p>
               <small>
                 {p.position[1].toFixed(4)}° N, {p.position[0].toFixed(4)}° E ·
-                Clinical suitability unknown
+                {p.placeType === "PointOfInterest"
+                  ? "Clinical suitability unknown"
+                  : "Geographic reference · not a treatment facility"}
               </small>
               {f ? (
                 <button onClick={() => onSelect(f)}>

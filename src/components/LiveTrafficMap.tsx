@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { MAPS_KEY } from "../services/apiClient";
+import { MAPS_KEY, MAPS_DEMO } from "../services/apiClient";
 import { decodePolyline } from "../services/accessibilityService";
 import type {
   Coverage,
@@ -163,6 +163,7 @@ export function LiveTrafficMap({
         const m = new google.maps.marker.AdvancedMarkerElement({
           map: gmap.current,
           position: f,
+          gmpClickable: true,
           content: markerHtml(
             f.kind === "reference" ? "R" : "+",
             selected?.id === f.id
@@ -173,7 +174,7 @@ export function LiveTrafficMap({
           ),
           title: f.name,
         });
-        m.addListener("click", () => onSelect(f));
+        m.addEventListener("gmp-click", () => onSelect(f));
         markers.current.push(m);
       }
       markers.current.push(
@@ -331,7 +332,9 @@ export function LiveTrafficMap({
       <div ref={host} className="map-canvas" data-testid="care-map" />
       <div className={`map-mode ${mode === "google" ? "real" : ""}`}>
         {mode === "google"
-          ? "Google Maps · routing estimates separate"
+          ? MAPS_DEMO
+            ? "Google Maps · Demo Key · quota-limited prototype"
+            : "Google Maps · routing estimates separate"
           : mode === "loading"
             ? "Loading geographic view…"
             : `Demo map · ${reason}`}

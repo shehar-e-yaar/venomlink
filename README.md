@@ -1,24 +1,27 @@
 # VenomLink
 
-**A map of the gap between a nearby hospital and accessible, suitable care.**
+**Explore the gap between a hospital nearby and accessible, suitable care.**
 
-VenomLink explores snakebite-care geography in Lahore. Inspect independent facility records, compare sample-community access, and test how a Ravi crossing disruption or hypothetical local capability upgrade changes that access.
+VenomLink is a hackathon prototype for Lahore: inspect independent public facility records, request Google driving estimates, and test how a Ravi crossing disruption or hypothetical local capability upgrade changes modeled geographic access.
 
-- [Application](https://shehar-e-yaar.github.io/venomlink/) — explicitly labeled demo until provider setup is completed.
+- [Open the prototype](https://shehar-e-yaar.github.io/venomlink/)
+- [Watch the narrated walkthrough](https://shehar-e-yaar.github.io/venomlink/demo.html)
 - [Editable Figma design](https://www.figma.com/design/YW6WtWs7SMQb0aGdPstddh)
-- [Architecture](ARCHITECTURE.md), [provider setup](SETUP.md), [submission draft](submission/SUBMISSION_WRITEUP.md), [2:45 demo script](submission/DEMO_VIDEO_SCRIPT.md).
+- [Architecture](ARCHITECTURE.md), [setup](SETUP.md), [submission write-up](submission/SUBMISSION_WRITEUP.md)
 
-## Current implementation status
+## Verified implementation
 
-Working without credentials: interactive geographic map, 11 attributed facility/reference records, eight approximate community anchors, map-origin selection, directory search, source-lineage flip cards, filters, sample-community coverage, bridge delay/closure and THQ upgrade scenarios, responsive layout, privacy/terms, and a local-only photo preview.
+The deployed backend in Sydney uses API Gateway and Lambda, Amazon Location SearchNearby/SearchText, private encrypted/versioned S3, and Secrets Manager for the backend route credential. The browser displays independently sourced coordinates on Google Maps using a **no-billing Maps Demo Key**. The selected route uses real Compute Routes responses, traffic-aware driving duration, distance, encoded geometry and provider speed intervals when returned. All 11 independent records have been retrieved through the deployed S3 API.
 
-Implemented but **not deployed or verified against live providers**: AWS SDK v3 SearchNearby/SearchText via Lambda/API Gateway; independent datasets served from private S3; Google Maps TrafficLayer; protected Google computeRoutes/computeRouteMatrix via Secrets Manager; traffic interval rendering and bounded automatic refresh. The owner has not yet configured AWS or a billing-enabled Google project. The public demo does not pretend these are connected.
+The Maps Demo Key supports Compute Routes but the separate computeRouteMatrix method rejected the key with BILLING_DISABLED. Demo mode therefore compares up to five independent candidates through supported Compute Routes calls **only when requested**. Missing routes remain unavailable per candidate. No paid Google billing was enabled. Google demo quotas can pause service, and the key is strictly for evaluation/prototyping, not production. [Google demo-key guide](https://developers.google.com/maps/documentation/javascript/demo-key).
 
-Optional deployment extensions: Glue/Iceberg ETL and Athena queries. No trained snake classifier is supplied; four illustrated examples are explicitly not inference. A [2:46 narrated screenshot walkthrough](https://shehar-e-yaar.github.io/venomlink/demo.html) demonstrates the actual application screens and discloses unconfigured providers. This is not yet a fully verified hackathon submission: the brief requires genuinely functioning AWS Places and S3 integrations. Replace the walkthrough with a live-provider recording after verification.
+AWS hospital-category searches around the sample origin returned zero matches in the live checks. SearchText returned the actual Shahdara locality. The UI preserves this provider coverage gap: zero results do not establish that hospitals are absent, and a locality is not a treatment facility. AWS results stay in an attributed session-only discovery list, separate from the independent map dataset.
+
+Working interactions include origin selection, directory search, source-lineage flip cards, verification/geographic filters, live route inspection, on-demand comparisons, community access modeling, bridge delay/closure, a THQ planning upgrade, responsive layout, and local-only photo preview. Four photo-helper illustrations are labeled examples; **no trained classifier is connected**. Iceberg/Athena scripts are provided but have not been deployed or verified live.
 
 ## Run and verify
 
-Requires Node 22+ and Python 3.10+.
+Use Node 22+ and Python 3.10+:
 
 ```sh
 npm ci
@@ -27,38 +30,30 @@ npm test
 npm run build
 npm run backend:build
 python pipeline/validate_facilities.py
-python pipeline/etl_to_s3_iceberg.py
 ```
 
-Open `http://127.0.0.1:5190`. Copy `.env.example` to `.env.local` only when configuring live services. Vite exposes every `VITE_*` value to browsers; only the restricted browser Maps key belongs there, never the Routes server key or AWS secrets.
+Open `http://127.0.0.1:5190`. Copy `.env.example` to `.env.local` and fill only your browser credential and backend URL. `VITE_*` values are browser-visible. Never commit AWS credentials or a private server credential. Set `VITE_GOOGLE_MAPS_DEMO_MODE=true` for the no-billing prototype path. Missing/failed map credentials fall back to an attributed OSM map, with independent illustrative geometry only; Google route geometry is never rendered on that fallback.
 
-## A reproducible demo
+On Windows, `. .\pipeline\use-cloud-tools.ps1` refreshes installed CLI paths and selects an isolated Node 22 runtime when available. Python data dependencies belong in `.venv`. Deployment instructions include an active AWS Free-plan/credit guard and never upgrade the account or activate Google billing.
 
-1. Start with Shahdara and inspect Mayo Hospital. The dashed path and ~26-minute value are illustrative planning estimates, not driving directions.
-2. Flip the facility card to inspect coordinates, original source links, retrieval date, unknown clinical fields and dataset version.
-3. Open Planner Simulator. At 20 minutes, baseline coverage is 4/8. A hypothetical Shahdara Town THQ eligibility upgrade changes this to 6/8. It does not claim that any real capability or stock exists.
-4. Restore baseline, choose 30 minutes, then add the crossing delay: sampled coverage falls from 5/8 to 4/8. At 20 minutes the north-side anchors were already outside, so a delay changes their journey estimates without further reducing the coverage percentage.
-5. Try crossing closure: crossing-dependent paths become unavailable, with no invented detour. Try Verified Only: no facilities meet independent clinical verification in this dataset.
-6. Inspect AWS Discovery and Live Traffic. Without configuration they explicitly report unavailable; no synthetic provider responses are substituted.
+## Explore the scenario
 
-## Data and modeling
+1. Select Shahdara and Mayo Hospital; distinguish the live driving estimate from the separate illustrative model. Flip the card to inspect its real source record and S3 delivery metadata.
+2. Open Planner Simulator: at twenty minutes the baseline covers **4/8** sample communities. A hypothetical Shahdara Town THQ eligibility upgrade changes this to **6/8**. No real treatment upgrade or antivenom stock is asserted.
+3. Restore baseline and choose thirty minutes. A hypothetical crossing delay changes modeled coverage from **5/8 to 4/8**. Only crossing-dependent model journeys receive the delay. A closure removes those connections without inventing a detour. These scenarios do not modify Google's reported road conditions.
+4. Try Verified Only: no clinical snakebite capabilities have been independently confirmed. Request a driving comparison only as geographic information, then confirm actual care directly.
+5. Inspect AWS Discovery; try SearchText for Shahdara. It returns a geographic reference, not medical suitability.
 
-The independent snapshot contains ten human-hospital candidates and one UVAS reference institution. Seven hospital locations derive from a saved OpenStreetMap hospital extract; three derive from published Punjab government coordinates. UVAS is approximate and excluded from human-care comparisons. Government Shahdara Teaching Hospital and Government Hospital Shahdara Town (THQ Level) are separate records.
+## Independent data and assumptions
 
-Sources: [OpenStreetMap/ODbL](https://www.openstreetmap.org/copyright), [PITB coordinate document](https://pitb.gov.pk/system/files/DC-15.pdf), [Punjab Health hospital-name document](https://health.punjab.gov.pk/uploads/circular/10364Circular%20letter%20for%20chelum%20of%20hazrat%20imam%20hussain.pdf), [UVAS](https://www.uvas.edu.pk/). Source-document dates do not establish current operations. Retrieval timestamps are not clinical verification.
+The snapshot contains ten human-hospital candidates and one UVAS reference institution, plus eight approximate community anchors. Seven hospital coordinates derive from the saved OSM extract; three from published Punjab government coordinates. Government Shahdara Teaching Hospital and Government Hospital Shahdara Town (THQ Level) are distinct records. UVAS is approximate and excluded from human-care comparisons.
 
-`pipeline/fetch_sources.py` retrieves the geographic extract; `build_facilities.py` reproduces the selected records; `validate_facilities.py` checks coordinates, sources and reference exclusions. Community anchors are hand-curated approximations with source links. No historical snake sightings are invented.
+Sources: [OpenStreetMap/ODbL](https://www.openstreetmap.org/copyright), [PITB coordinates](https://pitb.gov.pk/system/files/DC-15.pdf), [Punjab Health facility names](https://health.punjab.gov.pk/uploads/circular/10364Circular%20letter%20for%20chelum%20of%20hazrat%20imam%20hussain.pdf), [UVAS](https://www.uvas.edu.pk/). Source dates do not establish current operations; retrieval dates are not clinical verification. Reproduce the dataset with `pipeline/fetch_sources.py`, `build_facilities.py`, and `validate_facilities.py`. No historical snake sightings are invented.
 
-Planning uses geographic segments, a 1.35 detour multiplier, 20 km/h assumed speed, four minutes access overhead and one declared crossing anchor. Crossing delay is a hypothetical +20 minutes. Closure removes those connections. Upgrade changes only `shahdara-thq` eligibility. The six baseline eligible hospitals are an **illustrative scenario assumption**, not confirmed snakebite providers. Percentages represent unweighted sampled-community count, not population coverage. Highlight circles are not isochrones. See `src/services/accessibilityService.ts`.
+Planning uses geographic segments, 1.35 detour multiplier, 20 km/h assumed speed, four minutes access overhead, and one declared crossing anchor. Six baseline hospitals are eligible only by an illustrative scenario assumption. The gauge counts unweighted sample origins, not people or population coverage. Highlight circles are not isochrones. All treatment-capability and antivenom-stock fields remain unknown.
 
-## Provider boundaries
+## Limits and rights
 
-AWS Places discovery is a separate, attributed, ephemeral list. It is not a medical dataset, is never persisted in the independent S3/Iceberg dataset, and is not plotted on a third-party map. Matching a result to an independent record is provisional. Google route geometry is rendered only on Google Maps; the OSM fallback shows independent planning geometry only. Google traffic colors appear only for returned provider speed intervals. Matrix failures remain unavailable per destination.
+This is a planning/navigation-support prototype, not ambulance dispatch or a clinically validated triage service. Driving durations are not ambulance response times. Coordinate centers are not surveyed entrances. No diagnosis, species identification, harmlessness or antivenom-treatment determination is made.
 
-The app debounces origin changes, cancels superseded requests, bounds the search area/radius/candidate count, and refreshes routes only while visible (default five minutes, minimum one minute). The public API template limits concurrency and request rate; CORS is not authentication. Review quotas and access controls for any wider deployment.
-
-## Product limits
-
-This is a planning and navigation-support prototype. No independently confirmed snakebite capability, antivenom stock, opening status, entrance location, dispatch integration or ambulance ETA is asserted. Confirm actual care directly. The photo helper makes no species, venom, harmlessness or treatment determination.
-
-Code license: MIT. OSM-derived data retains ODbL attribution; government facts are attributed without asserting a broad license over the underlying documents.
+Code: MIT. OSM-derived data retains ODbL attribution. Government facts are attributed without claiming a broad license over their source documents. Provider discovery/route content is not persisted in S3 or optional Iceberg data. Google content appears only with Google Maps and its attribution.

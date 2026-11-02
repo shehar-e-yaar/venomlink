@@ -1,42 +1,44 @@
 # VenomLink — Snakebite Care & Healthcare Accessibility Atlas
 
-**Draft: complete live provider verification before submitting.**
-
 ## The problem
 
-A hospital can be nearby on a map while appropriate care remains difficult to reach. In Lahore, a journey across the Ravi and uncertain facility capabilities make distance alone an inadequate planning measure. VenomLink makes that distinction visible: where are facilities, what evidence supports those records, and how sensitive is modeled geographic access to a crossing disruption or a local capability improvement?
+A hospital marker establishes a location, not suitable care or reliable access. In Lahore, river crossings, driving conditions and uncertain facility capability make distance alone an inadequate planning measure. VenomLink connects inspectable facility evidence, real road estimates and explicit infrastructure scenarios.
 
-## What we built
+## What people can explore
 
-A responsive interactive atlas with independent hospital records, inspectable data lineage, sample-community access modeling, origin selection, facility comparisons and transparent infrastructure scenarios. The visual centerpiece is a map paired with a live recalculating semicircular access gauge. Users can test a hypothetical crossing delay, remove crossing-dependent connections, or change Shahdara Town THQ's planning eligibility.
+An interactive map displays independently sourced hospital candidates. Users can select an origin, inspect a record's original sources, request a real driving route, compare up to five nearby candidates, and test a hypothetical Ravi crossing delay/closure or Shahdara Town THQ eligibility upgrade. A semicircular gauge recalculates access across eight sample communities.
 
-The map does not pretend that unknown care is verified. All treatment-capability and antivenom-stock fields remain unknown. UVAS is reference-only. A photo helper illustrates an optional future workflow without inventing AI predictions.
+The twenty-minute illustrative baseline covers 4/8 sample communities; the hypothetical THQ eligibility change raises that to 6/8. At thirty minutes a hypothetical crossing delay changes sampled access from 5/8 to 4/8. These values come from declared assumptions, not population analysis or proof of treatment availability. Scenario changes affect the planning model, not Google's reported road conditions.
 
-## Dataset
+## Original dataset
 
-Eleven independent records: ten human-hospital candidates and one UVAS reference point. Sources combine a saved OpenStreetMap extract, public Punjab government facility coordinates and hospital-name documents, with an approximate UVAS campus point. Eight approximate community anchors support a reproducible, unweighted access comparison. Each facility carries coordinate/source links, quality, retrieval timestamp, dataset version and explicit clinical status.
+Eleven independent records: ten human-hospital candidates and one UVAS reference point. Sources combine a saved OSM extract, public Punjab government coordinates and hospital-name documents, with an approximate UVAS campus point. Eight approximate community anchors support reproducible comparisons. Every facility includes coordinate provenance, quality, retrieval timestamp, dataset version and clinical status. All snakebite-treatment capability and antivenom-stock fields remain unknown; UVAS is excluded from human-care comparisons. No historical sightings are invented.
 
-## How AWS powers the implementation
+## Functioning AWS services
 
-The implemented backend uses AWS SDK v3 Amazon Location SearchNearby/SearchText through API Gateway and Lambda. Independent validated datasets are designed to be served from a private encrypted/versioned S3 bucket. Optional Python ETL supports a dedicated Glue/Iceberg table and Athena analysis. Discovery results are ephemeral, attributed and separate from the independent dataset.
+The deployed Sydney backend uses Amazon Location SearchNearby/SearchText through API Gateway and Lambda. Python validation uploads the independent dataset to a private encrypted/versioned S3 bucket; the app retrieves all eleven records through the deployed API with actual S3 delivery metadata. Secrets Manager holds the authorized backend route credential, readable only through the function's scoped role permission.
 
-**Actual deployment status:** these AWS paths have been implemented and locally built, but have not been deployed or verified live because the owner's AWS account/profile still needs setup. Do not describe them as functioning integrations until verified. The currently published frontend uses its independent bundled snapshot and OSM fallback.
+Live hospital-category searches returned zero matches around the sample origin. A live SearchText query returned the Shahdara locality. The UI preserves that distinction: a locality is not medical care, and zero provider matches do not imply hospitals are absent. AWS responses remain ephemeral, attributed and separate from the independent map dataset.
 
-Google Maps, TrafficLayer and the protected Routes backend are implemented separately, with real geometry limited to Google Maps. They also await the owner's billing-enabled project and credentials.
+## Real routing within a zero-cash prototype
 
-## What makes it distinctive
+The owner supplied a no-billing Google Maps Demo Key. Actual tests verified map rendering, a traffic-aware Compute Routes estimate, encoded road geometry and returned speed intervals. An on-demand comparison returned real estimates for five hospital candidates. The native computeRouteMatrix API rejected the demo key with BILLING_DISABLED, so demo mode uses up to five supported Compute Routes calls instead. No Google billing was enabled, and the AWS account remains on its existing Free plan using credits.
 
-VenomLink connects record provenance to geographic planning: users can move from a facility marker to its actual evidence, then test how a declared infrastructure assumption affects sample origins. The 20-minute baseline covers 4 of 8 anchors under the stated assumptions; a hypothetical THQ eligibility upgrade raises this to 6 of 8. That is a scenario result, not proof of clinical coverage or lives saved. At a 30-minute threshold, adding the hypothetical crossing delay reduces sampled access from 5/8 to 4/8.
+Google geometry is rendered only on Google Maps, with attribution. The OSM fallback shows independent illustrative paths only. Quota/provider failures stay explicit rather than becoming synthetic estimates. Driving times are not ambulance response times and do not verify care suitability.
 
-## Limitations and next steps
+## Craft and reproducibility
 
-Confirm facility capabilities and antivenom inventories with actual healthcare partners; verify map-provider coverage and production routes; replace the simple geographic planning model with a validated road-network study; add population-weighted analysis only with a credible population dataset. Any future image classifier requires a trained model and independent validation and must never delay care.
+The warm cream/amber bento interface includes a dominant map, source-flip card, semicircular gauge, dark searchable directory, responsive layouts and explicit provider/error states. The public repository contains source data, Python validation/ETL, SAM infrastructure, tests, setup instructions, editable Figma construction source and a narrated walkthrough using actual application screenshots.
+
+## Limits and next steps
+
+The Maps Demo Key is strictly for evaluation/testing and can pause at its usage cap; it is not a production service. Independent clinical verification and real healthcare partnerships are still needed. Photo-helper illustrations and local previews are not AI inference; no trained classifier is connected. Glue/Iceberg/Athena scripts are optional extensions, not deployed integrations. Further work would validate facility capabilities, inventory and road-model assumptions before any operational healthcare use.
 
 ## Links
 
-- App: https://shehar-e-yaar.github.io/venomlink/
-- Source: https://github.com/shehar-e-yaar/venomlink
-- Figma: https://www.figma.com/design/YW6WtWs7SMQb0aGdPstddh
-- Video: https://shehar-e-yaar.github.io/venomlink/demo.html — 2:46 narrated walkthrough using actual app screenshots; providers explicitly unconfigured.
+- [Application](https://shehar-e-yaar.github.io/venomlink/)
+- [Public walkthrough](https://shehar-e-yaar.github.io/venomlink/demo.html)
+- [Source](https://github.com/shehar-e-yaar/venomlink)
+- [Figma](https://www.figma.com/design/YW6WtWs7SMQb0aGdPstddh)
 
-Before submission: verify actual AWS Places and S3 operation, replace this status paragraph with documented evidence, replace the screenshot walkthrough with a live-provider recording under three minutes, and confirm the official challenge form and deadline.
+The owner should review the write-up, video and official entry form before final submission. No claim of clinical validation or guaranteed competition outcome is made.
