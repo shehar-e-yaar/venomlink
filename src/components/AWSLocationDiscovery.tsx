@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import { Cloud, LoaderCircle, Search, ArrowUpRight, Link2 } from "lucide-react";
 import type { DiscoveredPlace, Origin, Facility } from "../types";
 import { haversine } from "../services/accessibilityService";
@@ -24,6 +25,18 @@ export function AWSLocationDiscovery({
   onSelect: (f: Facility) => void;
   searchedAt: string | null;
 }) {
+  const [query, setQuery] = useState("");
+  const searchInput = useRef<HTMLInputElement>(null);
+  const nearby = facilities
+    .filter(
+      (f) =>
+        f.kind === "human-hospital" &&
+        haversine(origin, f) <= radius / 1000 &&
+        `${f.name} ${f.neighborhood}`
+          .toLowerCase()
+          .includes(query.trim().toLowerCase()),
+    )
+    .sort((a, b) => haversine(origin, a) - haversine(origin, b));
   const match = (p: DiscoveredPlace) =>
     facilities.find(
       (f) =>
@@ -92,9 +105,9 @@ export function AWSLocationDiscovery({
           </p>
           <button
             className="outline-button"
-            onClick={() => onSearch(origin.name)}
+            onClick={() => searchInput.current?.focus()}
           >
-            Search {origin.name}
+            Enter a hospital or area name
           </button>
         </div>
       )}
@@ -108,6 +121,9 @@ export function AWSLocationDiscovery({
       >
         <Search size={15} />
         <input
+          ref={searchInput}
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
           name="query"
           aria-label="AWS place query"
           placeholder="Hospital or area name..."
@@ -149,6 +165,34 @@ export function AWSLocationDiscovery({
           );
         })}
       </div>
+      <section className="saved-discovery">
+        <h3>Saved hospital directory</h3>
+        <p>
+          {nearby.length} locations within {radius / 1000} km. Independent
+          records, separate from AWS search.
+        </p>
+        {nearby.map((f) => (
+          <button
+            className="saved-discovery-row"
+            key={f.id}
+            onClick={() => onSelect(f)}
+          >
+            <span>
+              <strong>{f.name}</strong>
+              <small>
+                {haversine(origin, f).toFixed(1)} km straight-line distance /
+                Demo: 10 injections
+              </small>
+            </span>
+            <ArrowUpRight size={15} />
+          </button>
+        ))}
+        {!nearby.length && (
+          <p>
+            No saved locations match. Increase the radius or clear the search.
+          </p>
+        )}
+      </section>
       <details className="source-details">
         <summary>About these results</summary>
         <p>

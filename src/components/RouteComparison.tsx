@@ -68,7 +68,7 @@ export function RouteComparison({
                         {f.name}
                         <ArrowUpRight size={12} />
                       </button>
-                      <small>Capability unconfirmed</small>
+                      <small>Demo: 10 injections / real stock unverified</small>
                     </td>
                     <td>
                       {item?.durationSec != null

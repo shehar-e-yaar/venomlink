@@ -82,6 +82,15 @@ export function DataLineageFlip({
                   : ""}
             </span>
           </div>
+          {facility.kind === "human-hospital" && (
+            <div className="demo-inventory">
+              <strong>DEMO INVENTORY / 10 injections</strong>
+              <small>
+                Simulated stock for this prototype. Confirm real availability
+                with the hospital.
+              </small>
+            </div>
+          )}
           <div className="unknown-label">
             {facility.kind === "reference"
               ? "Not a human emergency-care facility"

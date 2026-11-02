@@ -1015,3 +1015,72 @@
     padding: 14px 16px;
   }
 }
+.demo-inventory {
+  padding: 9px 11px;
+  background: #eaf3f8;
+  border: 1px solid #d9e6ef;
+  border-radius: 10px;
+  margin: 8px 0;
+}
+.demo-inventory strong {
+  display: block;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  color: #476b80;
+}
+.demo-inventory small {
+  display: block;
+  font-size: 9px;
+  line-height: 1.5;
+  margin-top: 4px;
+  color: #6c7b86;
+}
+.product-map .facility-popup {
+  height: 415px;
+}
+.saved-discovery {
+  margin: 22px 0;
+  border-top: 1px solid #dbe6ed;
+  padding-top: 18px;
+}
+.saved-discovery h3 {
+  font-size: 20px;
+  margin-bottom: 8px;
+}
+.saved-discovery > p {
+  font-size: 12px;
+  margin-bottom: 14px;
+}
+.saved-discovery-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  text-align: left;
+  gap: 15px;
+  padding: 14px 0;
+  border-bottom: 1px solid #dce7ef;
+}
+.saved-discovery-row strong {
+  display: block;
+  font-size: 14px;
+  font-weight: 500;
+}
+.saved-discovery-row small {
+  display: block;
+  margin-top: 6px;
+  font-size: 11px;
+  color: #738797;
+}
+@media (max-width: 600px) {
+  .product-map .facility-popup {
+    height: 385px;
+    bottom: 50px;
+  }
+  .demo-inventory {
+    padding: 7px 9px;
+  }
+  .demo-inventory small {
+    font-size: 8px;
+  }
+}

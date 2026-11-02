@@ -529,7 +529,10 @@ export function ProductExperience(p: Props) {
             </a>
           )}
           <p className="hospital-legend">
-            <b>A?</b> User-listed antivenom lead <span>Stock unconfirmed</span>{" "}
+            <b>A?</b> User-listed antivenom lead{" "}
+            <span>
+              Demo: 10 injections per hospital / real stock unverified
+            </span>{" "}
             <b>H</b> Other hospital <b>R</b> Reference
           </p>
           {p.dataError && (
@@ -588,7 +591,7 @@ export function ProductExperience(p: Props) {
                             {f.neighborhood} ·{" "}
                             {f.kind === "reference"
                               ? "Reference only"
-                              : "Capability unconfirmed"}
+                              : "Demo: 10 injections / stock unverified"}
                           </small>
                         </span>
                         <ArrowUpRight size={12} />
