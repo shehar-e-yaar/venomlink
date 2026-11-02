@@ -1,3 +1,4 @@
+import { ANTIVENOM_LEADS } from "../services/hospitalSelection";
 import { useEffect, useRef, useState } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
@@ -165,14 +166,18 @@ export function LiveTrafficMap({
           position: f,
           gmpClickable: true,
           content: markerHtml(
-            f.kind === "reference" ? "R" : "+",
+            f.kind === "reference"
+              ? "R"
+              : ANTIVENOM_LEADS.has(f.id)
+                ? "A?"
+                : "H",
             selected?.id === f.id
               ? "chosen"
               : f.kind === "reference"
                 ? "reference"
                 : "facility",
           ),
-          title: f.name,
+          title: `${f.name} / ${ANTIVENOM_LEADS.has(f.id) ? "User-listed antivenom lead; stock unconfirmed" : f.kind === "reference" ? "Reference only" : "Hospital; antivenom unconfirmed"}`,
         });
         m.addEventListener("gmp-click", () => onSelect(f));
         markers.current.push(m);
@@ -193,7 +198,11 @@ export function LiveTrafficMap({
           icon: L.divIcon({
             className: "map-pin-wrapper",
             html: markerHtml(
-              f.kind === "reference" ? "R" : "+",
+              f.kind === "reference"
+                ? "R"
+                : ANTIVENOM_LEADS.has(f.id)
+                  ? "A?"
+                  : "H",
               selected?.id === f.id
                 ? "chosen"
                 : f.kind === "reference"
@@ -205,7 +214,9 @@ export function LiveTrafficMap({
           }),
         })
           .addTo(localLayer.current)
-          .bindTooltip(f.name, { direction: "top" })
+          .bindTooltip(`${f.name} / Antivenom stock unconfirmed`, {
+            direction: "top",
+          })
           .on("click", () => onSelect(f));
       L.marker([origin.lat, origin.lng], {
         icon: L.divIcon({

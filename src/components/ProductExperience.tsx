@@ -6,6 +6,7 @@ import {
   useTransform,
 } from "framer-motion";
 import {
+  Github,
   ArrowDown,
   ArrowDownRight,
   ArrowRight,
@@ -34,6 +35,10 @@ export type ProductModal =
   | "routes";
 type Props = {
   origin: Origin;
+  automaticRoute: string;
+  comparisonScope: string;
+  hasFastest: boolean;
+  onFastest: () => void;
   facilities: Facility[];
   selectedId: string | null;
   directoryQuery: string;
@@ -146,10 +151,15 @@ export function ProductExperience(p: Props) {
             The atlas
           </a>
         </nav>
-        <button className="primary-button header-cta" onClick={goMap}>
-          Explore the map
-          <ArrowUpRight size={14} />
-        </button>
+        <a
+          className="github-link"
+          href="https://github.com/shehar-e-yaar"
+          target="_blank"
+          rel="noreferrer"
+          aria-label="Visit my GitHub"
+        >
+          <Github size={22} />
+        </a>
         <button
           className="mobile-menu"
           aria-label={menuOpen ? "Close navigation" : "Open navigation"}
@@ -195,42 +205,6 @@ export function ProductExperience(p: Props) {
                 fetchPriority="high"
               />
             </motion.div>
-            <motion.button
-              className="glass-panel hero-provenance"
-              onClick={() => p.onOpen("data")}
-              initial={reduced ? false : { opacity: 0, x: -15 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.65, duration: 0.7 }}
-            >
-              <span className="panel-overline">
-                A POINT WITH A PURPOSE
-                <ArrowUpRight size={13} />
-              </span>
-              <svg
-                className="coordinate-art"
-                viewBox="0 0 180 54"
-                fill="none"
-                aria-hidden="true"
-              >
-                <path
-                  d="M0 37Q30 4 62 28T124 21T180 29M0 43Q37 13 70 34T139 27T180 34"
-                  stroke="currentColor"
-                  strokeWidth=".8"
-                />
-                <path
-                  d="M0 47Q35 28 67 41T133 36T180 41"
-                  stroke="currentColor"
-                  strokeWidth=".5"
-                />
-                <circle cx="87" cy="30" r="4" fill="#ee650b" />
-                <circle cx="87" cy="30" r="10" stroke="#ee650b" opacity=".3" />
-              </svg>
-              <strong>Evidence in every point.</strong>
-              <span>
-                Explore the source
-                <ArrowRight size={12} />
-              </span>
-            </motion.button>
             <div className="hero-context">
               <p className="product-eyebrow">LAHORE, PAKISTAN</p>
               <p>Snakebite care, mapped.</p>
@@ -308,10 +282,6 @@ export function ProductExperience(p: Props) {
             <p className="section-copy">
               Care locations. Road context. Clear sources.
             </p>
-            <a className="primary-button" href="#pipeline">
-              Follow the data
-              <ArrowDownRight size={14} />
-            </a>
           </Reveal>
           <div className="vision-visual">
             <img
@@ -321,18 +291,42 @@ export function ProductExperience(p: Props) {
               height="1024"
               loading="lazy"
             />
-            <Reveal className="glass-panel vision-panel">
+            <motion.button
+              className="glass-panel vision-panel evidence-panel"
+              onClick={() => p.onOpen("data")}
+              initial={reduced ? false : { opacity: 0, x: -15 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.65, duration: 0.7 }}
+            >
               <span className="panel-overline">
-                DESIGNED FOR TRANSPARENCY
-                <ShieldCheck size={15} />
+                A POINT WITH A PURPOSE
+                <ArrowUpRight size={13} />
               </span>
-              <strong>Know what a point means.</strong>
-              <p>Care capability requires confirmation.</p>
-              <button className="quiet-link" onClick={() => p.onOpen("data")}>
-                Inspect the evidence
-                <ArrowUpRight size={12} />
-              </button>
-            </Reveal>
+              <svg
+                className="coordinate-art"
+                viewBox="0 0 180 54"
+                fill="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M0 37Q30 4 62 28T124 21T180 29M0 43Q37 13 70 34T139 27T180 34"
+                  stroke="currentColor"
+                  strokeWidth=".8"
+                />
+                <path
+                  d="M0 47Q35 28 67 41T133 36T180 41"
+                  stroke="currentColor"
+                  strokeWidth=".5"
+                />
+                <circle cx="87" cy="30" r="4" fill="#ee650b" />
+                <circle cx="87" cy="30" r="10" stroke="#ee650b" opacity=".3" />
+              </svg>
+              <strong>Evidence in every point.</strong>
+              <span>
+                Explore the source
+                <ArrowRight size={12} />
+              </span>
+            </motion.button>
           </div>
         </section>
         <section className="pipeline-section" id="pipeline">
@@ -344,7 +338,10 @@ export function ProductExperience(p: Props) {
             </h2>
             <p>Trace. Check. Explore.</p>
           </Reveal>
-          <div className="pipeline-track">
+          <div className="pipeline-track connected-timeline">
+            <div className="timeline-rail" aria-hidden="true">
+              <span />
+            </div>
             {[
               {
                 number: "01",
@@ -366,10 +363,8 @@ export function ProductExperience(p: Props) {
               },
             ].map(({ number, Icon, title, text }) => (
               <Reveal key={number} className="pipeline-step">
-                <div className="step-visual">
-                  <span>{number}</span>
-                  <Icon size={28} strokeWidth={1.1} />
-                  <ArrowRight className="step-arrow" size={19} />
+                <div className="timeline-node">
+                  <span>{number.replace("0", "")}</span>
                 </div>
                 <h3>{title}</h3>
                 <p>{text}</p>
@@ -389,8 +384,8 @@ export function ProductExperience(p: Props) {
         >
           <Reveal className="section-heading">
             <p className="product-eyebrow">THE INTERACTIVE ATLAS</p>
-            <h2 id="atlas-title">Care, in context.</h2>
-            <p>Choose a point. Explore nearby care.</p>
+            <h2 id="atlas-title">Venomap</h2>
+            <p>Explore snakebite care and antivenom leads on the map.</p>
           </Reveal>
           <div className="atlas-toolbar">
             <button
@@ -473,7 +468,7 @@ export function ProductExperience(p: Props) {
               </div>
               <button
                 className="primary-button compare-trigger"
-                aria-label="Compare 5 routes"
+                aria-label="Compare hospital routes"
                 onClick={p.onCompare}
               >
                 Compare routes
@@ -481,6 +476,25 @@ export function ProductExperience(p: Props) {
               </button>
             </div>
           </div>
+          <div
+            className="automatic-route glass-panel"
+            role="status"
+            aria-live="polite"
+          >
+            <div>
+              <strong>{p.automaticRoute}</strong>
+              <p>{p.comparisonScope}</p>
+            </div>
+            {p.hasFastest && (
+              <button className="quiet-link" onClick={p.onFastest}>
+                Show route <ArrowUpRight size={15} />
+              </button>
+            )}
+          </div>
+          <p className="hospital-legend">
+            <b>A?</b> User-listed antivenom lead <span>Stock unconfirmed</span>{" "}
+            <b>H</b> Other hospital <b>R</b> Reference
+          </p>
           {p.dataError && (
             <p className="atlas-status-note" role="status">
               {p.dataError}

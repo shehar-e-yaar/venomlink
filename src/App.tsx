@@ -1,3 +1,8 @@
+import {
+  ANTIVENOM_LEADS,
+  fastestRoute,
+  miles,
+} from "./services/hospitalSelection";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Activity,
@@ -92,7 +97,7 @@ export default function App() {
     }),
     [northOnly, setNorthOnly] = useState(false),
     [verifiedOnly, setVerifiedOnly] = useState(false),
-    [traffic, setTraffic] = useState(false),
+    [traffic, setTraffic] = useState(true),
     [showZones, setShowZones] = useState(false),
     [mapMode, setMapMode] = useState<MapMode>("loading"),
     [focusToken, setFocusToken] = useState(0),
@@ -101,6 +106,7 @@ export default function App() {
     [originQuery, setOriginQuery] = useState(""),
     [originError, setOriginError] = useState(""),
     [notice, setNotice] = useState(""),
+    [atlasActive, setAtlasActive] = useState(false),
     [matrix, setMatrix] = useState<MatrixItem[]>([]),
     [matrixStatus, setMatrixStatus] = useState("unavailable"),
     [matrixError, setMatrixError] = useState(""),
@@ -117,6 +123,21 @@ export default function App() {
     [radius, setRadius] = useState(10000);
   const mapSection = useRef<HTMLElement>(null),
     awsAbort = useRef<AbortController | null>(null);
+  useEffect(() => {
+    const node = mapSection.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries.some((entry) => entry.isIntersecting)) {
+          setAtlasActive(true);
+          observer.disconnect();
+        }
+      },
+      { rootMargin: "200px" },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, []);
   const close = useCallback(() => setModal(null), []);
   useEffect(() => {
     const c = new AbortController();
@@ -202,33 +223,64 @@ export default function App() {
       ? planJourney(origin, selected, scenario)
       : null;
   const candidates = useMemo(() => {
-    const hospitals = facilities.filter((f) => f.kind === "human-hospital");
-    const confirmed = hospitals.filter((f) => f.clinicalStatus === "confirmed");
-    return [...(confirmed.length ? confirmed : hospitals)]
+    const hospitals = facilities.filter(
+      (f) => f.kind === "human-hospital" && ANTIVENOM_LEADS.has(f.id),
+    );
+    return [...hospitals]
       .sort((a, b) => haversine(origin, a) - haversine(origin, b))
-      .slice(0, MAPS_DEMO ? 5 : 12)
       .map((f) => f.id);
   }, [dataset, origin]);
   useEffect(() => {
     const c = new AbortController();
     setMatrix([]);
     setMatrixError("");
+    if (!atlasActive) {
+      setMatrixStatus("waiting");
+      return;
+    }
+    if (API && dataSource === "Bundled independent snapshot" && !dataError) {
+      setMatrixStatus("loading");
+      return;
+    }
     if (!API || mapMode !== "google" || !candidates.length) {
       setMatrixStatus("unavailable");
       return;
     }
-    if (MAPS_DEMO && matrixNonce === 0) {
-      setMatrixStatus("on-demand");
-      return;
-    }
+    setMatrixStatus("loading");
     const timer = setTimeout(async () => {
       setMatrixStatus("loading");
       try {
-        const d = await routeMatrix(origin, candidates, c.signal);
+        // Each existing demo comparison supports at most five destinations.
+        const batches = [];
+        for (let i = 0; i < candidates.length; i += 5)
+          batches.push(candidates.slice(i, i + 5));
+        const responses = await Promise.all(
+          batches.map((ids) =>
+            routeMatrix(origin, ids, c.signal).catch((error) => {
+              if (c.signal.aborted) throw error;
+              return {
+                items: ids.map((facilityId) => ({
+                  facilityId,
+                  durationSec: null,
+                  staticSec: null,
+                  distanceMeters: null,
+                  error: (error as Error).message,
+                })),
+                calculatedAt: new Date().toISOString(),
+              };
+            }),
+          ),
+        );
+        const d = {
+          items: responses.flatMap((r) => r.items),
+          calculatedAt: responses.at(-1)!.calculatedAt,
+        };
         if (!c.signal.aborted) {
           setMatrix(d.items);
           setRefreshedAt(d.calculatedAt);
-          const usable = d.items.some((i) => i.durationSec !== null);
+          const best = fastestRoute(d.items);
+          const usable = !!best;
+          if (best) setSelectedId(best.facilityId);
           setMatrixStatus(usable ? "connected" : "error");
           if (!usable)
             setMatrixError(
@@ -247,7 +299,15 @@ export default function App() {
       clearTimeout(timer);
       c.abort();
     };
-  }, [origin, candidates, mapMode, MAPS_DEMO ? matrixNonce : refreshNonce]);
+  }, [
+    origin,
+    candidates,
+    mapMode,
+    atlasActive,
+    dataSource,
+    dataError,
+    MAPS_DEMO ? matrixNonce : refreshNonce,
+  ]);
   useEffect(() => {
     const c = new AbortController();
     setRoute(null);
@@ -425,7 +485,13 @@ export default function App() {
   const difference = route
     ? delaySeconds(route.durationSec, route.staticSec)
     : null;
+  const fastest = fastestRoute(matrix);
+  const fastestHospital = fastest
+    ? facilities.find((f) => f.id === fastest.facilityId)
+    : null;
+  const comparedCount = matrix.filter((i) => fastestRoute([i])).length;
   const compareRoutes = () => {
+    setAtlasActive(true);
     setMatrixNonce((n) => n + 1);
     if (!MAPS_DEMO) setRefreshNonce((n) => n + 1);
     setModal(API && mapMode === "google" ? "routes" : "traffic");
@@ -434,6 +500,20 @@ export default function App() {
     <>
       <ProductExperience
         origin={origin}
+        automaticRoute={
+          matrixStatus === "loading" || mapMode === "loading"
+            ? "Comparing traffic-aware routes..."
+            : fastest && fastestHospital
+              ? `Quickest returned route: ${fastestHospital.name} / ${Math.round(fastest.durationSec! / 60)} min / ${miles(fastest.distanceMeters!)} mi`
+              : matrixStatus === "waiting"
+                ? "Open Venomap to compare driving routes."
+                : matrixError || "Driving comparison unavailable. Try again."
+        }
+        comparisonScope={`${comparedCount} of ${candidates.length} user-listed hospitals returned routes. Antivenom stock unconfirmed.`}
+        onFastest={() => {
+          if (fastestHospital) select(fastestHospital);
+        }}
+        hasFastest={!!fastest}
         facilities={directory}
         selectedId={selectedId}
         directoryQuery={directoryQuery}

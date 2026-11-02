@@ -1,3 +1,4 @@
+import { miles } from "../services/hospitalSelection";
 import { RefreshCw, ArrowUpRight } from "lucide-react";
 import type { Facility, MatrixItem } from "../types";
 export function RouteComparison({
@@ -20,8 +21,8 @@ export function RouteComparison({
   return (
     <div className="route-comparison">
       <p className="intro-text">
-        Driving estimates for nearby candidates. Treatment capability still
-        needs direct confirmation.
+        Traffic-aware driving estimates for your seven hospital leads. Treatment
+        capability still needs direct confirmation.
       </p>
       <div className="comparison-actions">
         <span className="route-status">
@@ -76,7 +77,7 @@ export function RouteComparison({
                     </td>
                     <td>
                       {item?.distanceMeters != null
-                        ? `${(item.distanceMeters / 1000).toFixed(1)} km`
+                        ? `${miles(item.distanceMeters)} mi`
                         : "—"}
                     </td>
                   </tr>
@@ -86,8 +87,8 @@ export function RouteComparison({
         </table>
       </div>
       <p className="fine-print">
-        Candidates are chosen by geographic proximity, then sorted by returned
-        driving time. Estimates are not ambulance response times.
+        User-listed hospitals are sorted by returned driving time. Estimates are
+        not ambulance response times.
       </p>
     </div>
   );
