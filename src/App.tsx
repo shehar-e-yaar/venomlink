@@ -516,9 +516,9 @@ export default function App() {
               traffic: "Road access intelligence",
               planner: "Infrastructure changes access.",
               photo: "AI Species Helper",
-              data: "Every record has a source.",
+              data: "Behind the map.",
               architecture: "One product. Clear service boundaries.",
-              aws: "AWS Location Discovery",
+              aws: "Discover nearby.",
               privacy: "Privacy & location choices",
               terms: "Terms & responsible use",
             }[modal]
@@ -855,68 +855,64 @@ export default function App() {
           {modal === "data" && (
             <>
               <p className="intro-text">
-                Independent public facility records, provider discovery results
-                and Google route data have distinct sources and lifecycles.
+                Google maps the journey. Public records locate the care.
               </p>
-              <div className="data-metrics">
+              <div className="source-summary glass-panel">
                 <div>
-                  <strong>{facilities.length}</strong>
-                  <span>Independent records</span>
+                  <span>Map & driving routes</span>
+                  <strong>Google Maps</strong>
                 </div>
                 <div>
-                  <strong>0</strong>
-                  <span>Confirmed antivenom stocks</span>
+                  <span>Location discovery</span>
+                  <strong>Amazon Location</strong>
                 </div>
                 <div>
-                  <strong>{communities.length}</strong>
-                  <span>Sample communities</span>
-                </div>
-              </div>
-              <div className="notice">
-                <Database size={19} />
-                <div>
-                  <strong>{dataSource}</strong>
-                  <p>
-                    Dataset {dataset?.version || "loading"} · Ingested{" "}
-                    {dataset
-                      ? new Date(dataset.ingestedAt).toLocaleString()
-                      : "—"}
-                    . A review timestamp records source retrieval, not a
-                    clinical verification.
-                  </p>
+                  <span>Saved hospital coordinates</span>
+                  <strong>OpenStreetMap + Punjab records</strong>
                 </div>
               </div>
-              <h3>Location evidence is not medical suitability.</h3>
-              <p>
-                Hospital identities and coordinates come from OpenStreetMap and
-                public Punjab government documents. All snakebite capability and
-                stock fields remain unknown. UVAS is a reference institution and
-                is excluded from human-care comparisons.
+              <p className="clinical-note">
+                Treatment capability and antivenom stock are unconfirmed.
               </p>
-              <div className="source-records">
-                {facilities.map((f) => (
-                  <div key={f.id}>
-                    <span>{f.name}</span>
-                    <a
-                      href={f.coordinateSource}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Coordinate source
-                      <ArrowUpRight size={11} />
-                    </a>
-                    <button
-                      onClick={() => {
-                        select(f);
-                        setModal(null);
-                      }}
-                    >
-                      Inspect
-                      <Code2 size={11} />
-                    </button>
-                  </div>
-                ))}
-              </div>
+              <details className="source-details">
+                <summary>Dataset & technical details</summary>
+                <p>
+                  {facilities.length} independent records � {communities.length}{" "}
+                  sample communities.
+                </p>
+                <p>{dataSource}</p>
+                <p>
+                  Dataset {dataset?.version || "loading"}. Source review does
+                  not confirm clinical capability. UVAS is reference-only.
+                </p>
+              </details>
+              <details className="source-details">
+                <summary>Browse location records</summary>
+                <div className="source-records">
+                  {facilities.map((f) => (
+                    <div key={f.id}>
+                      <span>{f.name}</span>
+                      <a
+                        href={f.coordinateSource}
+                        target="_blank"
+                        rel="noreferrer"
+                      >
+                        Coordinate source
+                        <ArrowUpRight size={11} />
+                      </a>
+                      <button
+                        onClick={() => {
+                          select(f);
+                          setModal(null);
+                        }}
+                      >
+                        Inspect
+                        <Code2 size={11} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              </details>
               <a
                 className="download-link"
                 href={`${import.meta.env.BASE_URL}data/facilities.json`}
@@ -926,11 +922,6 @@ export default function App() {
                 Download independent snapshot
                 <ArrowDown size={14} />
               </a>
-              <p className="fine-print">
-                No operational Iceberg or Athena table is asserted. Deployment
-                configuration and ETL are supplied. Provider Places/Routes
-                content is not included in the independent snapshot.
-              </p>
             </>
           )}
           {modal === "architecture" && (

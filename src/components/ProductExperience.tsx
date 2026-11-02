@@ -233,12 +233,7 @@ export function ProductExperience(p: Props) {
             </motion.button>
             <div className="hero-context">
               <p className="product-eyebrow">LAHORE, PAKISTAN</p>
-              <p>
-                A clearer view of snakebite
-                <br />
-                care geography.
-                <br /> Built for exploration.
-              </p>
+              <p>Snakebite care, mapped.</p>
               <button className="primary-button" onClick={goMap}>
                 Enter the atlas
                 <ArrowUpRight size={14} />
@@ -307,13 +302,11 @@ export function ProductExperience(p: Props) {
           <Reveal className="vision-copy">
             <p className="product-eyebrow">BEYOND A PIN ON A MAP</p>
             <h2>
-              From a single point,
-              <br />
-              to a clearer picture.
+              Every point.
+              <br />A clearer picture.
             </h2>
             <p className="section-copy">
-              Traceable care locations. Real road estimates.
-              <br />A map that makes uncertainty visible.
+              Care locations. Road context. Clear sources.
             </p>
             <a className="primary-button" href="#pipeline">
               Follow the data
@@ -322,10 +315,10 @@ export function ProductExperience(p: Props) {
           </Reveal>
           <div className="vision-visual">
             <img
-              src={asset("glass-snake-detail.webp")}
-              alt="A flowing close-up of translucent crystal snake scales"
-              width="1774"
-              height="887"
+              src={asset("glass-snake-hero.webp")}
+              alt="A complete translucent glass snake sculpture"
+              width="1536"
+              height="1024"
               loading="lazy"
             />
             <Reveal className="glass-panel vision-panel">
@@ -334,11 +327,7 @@ export function ProductExperience(p: Props) {
                 <ShieldCheck size={15} />
               </span>
               <strong>Know what a point means.</strong>
-              <p>
-                A location is evidence of a place.
-                <br />
-                Treatment capability needs confirmation.
-              </p>
+              <p>Care capability requires confirmation.</p>
               <button className="quiet-link" onClick={() => p.onOpen("data")}>
                 Inspect the evidence
                 <ArrowUpRight size={12} />
@@ -353,7 +342,7 @@ export function ProductExperience(p: Props) {
               From source.
               <br className="mobile-break" /> To perspective.
             </h2>
-            <p>A simple path from public records to an explorable world.</p>
+            <p>Trace. Check. Explore.</p>
           </Reveal>
           <div className="pipeline-track">
             {[
@@ -361,19 +350,19 @@ export function ProductExperience(p: Props) {
                 number: "01",
                 Icon: Database,
                 title: "Source",
-                text: "Independent public records. Coordinates with a traceable origin.",
+                text: "Public records. Linked coordinates.",
               },
               {
                 number: "02",
                 Icon: ShieldCheck,
                 title: "Validate",
-                text: "Python checks the records. Amazon S3 delivers the dataset.",
+                text: "Checked with Python. Delivered by S3.",
               },
               {
                 number: "03",
                 Icon: MapPin,
                 title: "Explore",
-                text: "AWS discovery and Google road context, brought together.",
+                text: "AWS discovery. Google road context.",
               },
             ].map(({ number, Icon, title, text }) => (
               <Reveal key={number} className="pipeline-step">
@@ -400,11 +389,8 @@ export function ProductExperience(p: Props) {
         >
           <Reveal className="section-heading">
             <p className="product-eyebrow">THE INTERACTIVE ATLAS</p>
-            <h2 id="atlas-title">
-              A world worth
-              <br className="mobile-break" /> looking closer at.
-            </h2>
-            <p>Choose your origin. Inspect a location. Explore the journey.</p>
+            <h2 id="atlas-title">Care, in context.</h2>
+            <p>Choose a point. Explore nearby care.</p>
           </Reveal>
           <div className="atlas-toolbar">
             <button
@@ -594,10 +580,6 @@ export function ProductExperience(p: Props) {
               </div>
             </div>
           </div>
-          <p className="atlas-disclosure">
-            Geographic access is one part of the picture. Snakebite capability
-            and antivenom stock are unconfirmed; confirm care directly.
-          </p>
         </section>
         <section className="closing-section">
           <img
@@ -609,9 +591,9 @@ export function ProductExperience(p: Props) {
           <Reveal className="closing-copy">
             <p className="product-eyebrow">A NEW PERSPECTIVE STARTS HERE</p>
             <h2>
-              Every journey
+              Find your
               <br />
-              starts with a point.
+              perspective.
             </h2>
             <button className="primary-button" onClick={goMap}>
               Explore VenomLink

@@ -42,10 +42,7 @@ export function AWSLocationDiscovery({
     );
   return (
     <>
-      <p className="intro-text">
-        Amazon Location Places discovers geographic candidates. Discovery does
-        not verify clinical capability or antivenom availability.
-      </p>
+      <p className="intro-text">Search places around {origin.name}.</p>
       <div className="discovery-controls">
         <label>
           Search radius
@@ -73,28 +70,33 @@ export function AWSLocationDiscovery({
           Search with AWS
         </button>
       </div>
-      <p className="mono">
-        QueryPosition [{origin.lng.toFixed(5)}, {origin.lat.toFixed(5)}] ·{" "}
-        {origin.name}
-      </p>
       <div
-        className={`service-message ${status === "connected" ? "success" : ""}`}
+        className={`service-message ${status === "connected" && places.length ? "success" : ""}`}
         role="status"
       >
         {status === "connected"
-          ? `${places.length} real AWS result${places.length === 1 ? "" : "s"} · ${searchedAt ? new Date(searchedAt).toLocaleTimeString() : ""}`
+          ? places.length
+            ? `${places.length} ${places.length === 1 ? "place" : "places"} found`
+            : "No nearby hospital matches"
           : status === "searching"
             ? "Calling Amazon Location…"
             : error ||
               "AWS backend not connected. No AWS results have been generated."}
       </div>
       {status === "connected" && !places.length && (
-        <p className="safety-note">
-          AWS returned no matches for this query. This is a provider coverage
-          result, not evidence that hospitals are absent. The independent
-          facility directory remains available. Try an area name such as
-          Shahdara with SearchText.
-        </p>
+        <div className="discovery-empty glass-panel">
+          <strong>Try a place name instead.</strong>
+          <p>
+            AWS returned no hospitals for this radius. Your saved care locations
+            are still on the map.
+          </p>
+          <button
+            className="outline-button"
+            onClick={() => onSearch(origin.name)}
+          >
+            Search {origin.name}
+          </button>
+        </div>
       )}
       <form
         className="aws-text-search"
@@ -108,7 +110,7 @@ export function AWSLocationDiscovery({
         <input
           name="query"
           aria-label="AWS place query"
-          placeholder="SearchText: hospital name or area…"
+          placeholder="Hospital or area name..."
           maxLength={160}
         />
         <button type="submit" disabled={status === "searching"}>
@@ -147,11 +149,19 @@ export function AWSLocationDiscovery({
           );
         })}
       </div>
-      <p className="safety-note">
-        SingleUse results stay in memory and this attributed list. They are not
-        persisted to S3 or plotted on Google/OSM maps. Name-and-distance matches
-        are provisional.
-      </p>
+      <details className="source-details">
+        <summary>About these results</summary>
+        <p>
+          Powered by Amazon Location. Results stay in this session; they do not
+          confirm treatment or antivenom availability. Possible matches require
+          verification.
+        </p>
+        <p>
+          {searchedAt
+            ? `Last search: ${new Date(searchedAt).toLocaleTimeString()}`
+            : "Not searched yet"}
+        </p>
+      </details>
     </>
   );
 }

@@ -1704,11 +1704,11 @@ summary:focus-visible {
     margin-top: 0;
   }
   .hero-snake {
-    width: 430px;
+    width: 100%;
     max-width: none;
     left: 50%;
-    margin-left: -225px;
-    top: 72px;
+    margin-left: -50%;
+    top: 90px;
   }
   .snake-orbit {
     width: 480px;
