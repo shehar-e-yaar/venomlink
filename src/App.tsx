@@ -589,6 +589,12 @@ export default function App() {
             </div>
           </article>
         </section>
+        {!dataset && !dataError && (
+          <div className="dataset-warning" role="status">
+            <RefreshCw size={15} className="spin" />
+            Loading independent facility records…
+          </div>
+        )}
         {dataError && (
           <div className="dataset-warning" role="status">
             <Info size={15} />
@@ -700,11 +706,22 @@ export default function App() {
             </div>
           </section>
           <aside className="right-column">
-            <CoverageGauge
-              coverage={coverage}
-              scenario={scenario}
-              onExplain={() => setModal("planner")}
-            />
+            {dataset ? (
+              <CoverageGauge
+                coverage={coverage}
+                scenario={scenario}
+                onExplain={() => setModal("planner")}
+              />
+            ) : (
+              <section className="coverage-card card" role="status">
+                <h2>Care-Access Status</h2>
+                <p>
+                  {dataError
+                    ? "Facility data unavailable. Reload to retry."
+                    : "Loading independent records before calculating access…"}
+                </p>
+              </section>
+            )}
             <section className="directory-card">
               <div className="directory-heading">
                 <div>
@@ -772,11 +789,21 @@ export default function App() {
                 {!directory.length && (
                   <div className="empty-directory">
                     <ShieldQuestion size={24} />
-                    <strong>No matching verified facilities.</strong>
+                    <strong>
+                      {!dataset
+                        ? dataError
+                          ? "Facility records unavailable."
+                          : "Loading facility records…"
+                        : verifiedOnly
+                          ? "No matching verified facilities."
+                          : "No matching facilities."}
+                    </strong>
                     <p>
-                      No snakebite-treatment capabilities have been
-                      independently confirmed in this dataset. Turn off Verified
-                      Only to inspect source-linked candidates.
+                      {!dataset
+                        ? "Source records must load before this directory can be explored."
+                        : verifiedOnly
+                          ? "No snakebite-treatment capabilities have been independently confirmed in this dataset. Turn off Verified Only to inspect source-linked candidates."
+                          : "Try another name or clear the geographic filter."}
                     </p>
                   </div>
                 )}
