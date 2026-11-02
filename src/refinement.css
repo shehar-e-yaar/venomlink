@@ -59,6 +59,7 @@
   overflow: visible;
 }
 .vision-visual {
+  top: 0;
   right: 3%;
   width: 55%;
   height: 470px;
