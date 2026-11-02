@@ -1,50 +1,38 @@
 [
   {
-    "image": "desktop.png",
-    "title": "VenomLink: when nearby care is hard to reach",
-    "caption": "Lahore · real Google map and routes · independent facility evidence",
-    "speech": "A hospital marker tells us where a building is. It does not establish suitable care or reveal fragile access across a river. VenomLink connects geographic evidence, real driving estimates, and infrastructure scenarios in Lahore. This is a working hackathon prototype, shown through actual application screenshots."
+    "image": "venomlink-hero-aligned.png",
+    "title": "VenomLink: snakebite care, mapped",
+    "caption": "Lahore / an explorable geospatial prototype",
+    "speech": "A snake encounter raises two questions: what might this snake be, and how can I explore nearby care? VenomLink brings on-device species suggestions and an interactive hospital map together for Lahore. This walkthrough uses actual screenshots from the working application."
   },
   {
-    "image": "lineage.png",
-    "title": "Inspect the evidence behind each point",
-    "caption": "11 independent records served from private Amazon S3",
-    "speech": "Each independent facility record has coordinates, source links, quality, and a retrieval timestamp. Flip a card to inspect the actual record, served through the deployed private S three data path. Treatment capability and antivenom stock remain unknown. A retrieval date does not mean clinical verification."
+    "image": "venomlink-live-classifier.png",
+    "title": "A photo. A closer look.",
+    "caption": "Real browser inference / photos stay on your device",
+    "speech": "Choose a snake photograph and run the supplied Snake Teller classifier directly in your browser. The trained model was exported to ONNX and provides possible species matches. The separate foliage detector is excluded. A prediction is not a diagnosis or a determination of venom, safety, or treatment."
   },
   {
-    "image": "planner.png",
-    "title": "A hypothetical local upgrade changes access",
-    "caption": "20-minute model: 4/8 to 6/8 sampled communities",
-    "speech": "The separate planning model uses explicit assumptions about distance, speed and access overhead. At twenty minutes, four of eight sample communities meet the baseline threshold. Making Shahdara Town T H Q eligible raises that to six. This is a hypothetical planning change, not a real treatment or stock claim."
+    "image": "venomlink-live-google.png",
+    "title": "Real places, visible on a map",
+    "caption": "11 independent records / source-linked coordinates",
+    "speech": "The map starts with eleven independent facility records, including ten hospital candidates and one reference institution. Coordinates come from OpenStreetMap and public Punjab government sources. Python validates the dataset before it is stored in private Amazon S three and delivered through the application API."
   },
   {
-    "image": "delay.png",
-    "title": "One crossing. Different consequences.",
-    "caption": "30-minute model: 5/8 to 4/8 after a hypothetical crossing delay",
-    "speech": "At thirty minutes, a hypothetical crossing delay reduces sampled access from five communities to four. Only crossing dependent journeys receive that delay. Closure removes those model connections without inventing a detour. These percentages count sample communities, not population. The scenarios do not change Google's reported road conditions."
+    "image": "venomlink-working-routes.png",
+    "title": "Compare the journey, not just distance",
+    "caption": "Traffic-aware Google driving estimates / seven user-listed leads",
+    "speech": "Select a starting point and compare seven user-listed hospital leads. Google traffic-aware driving estimates provide travel time, distance, and road geometry. The app highlights the quickest returned route. This captured test returned all seven routes, with Mayo Hospital at thirteen minutes. Results change with time and provider availability."
   },
   {
-    "image": "aws.png",
-    "title": "AWS discovery preserves the coverage gap",
-    "caption": "Real Amazon Location SearchText response · locality, not medical care",
-    "speech": "Amazon Location Search Nearby and Search Text run through A W S Lambda. Hospital category searches returned no matches in our tests. An area search returned the actual Shahdara locality, clearly labeled as a geographic reference. Zero matches do not establish that hospitals are absent, and a locality is not medical care."
+    "image": "venomlink-demo-hospitals.png",
+    "title": "Discovery with an honest fallback",
+    "caption": "Amazon Location discovery / independent saved directory",
+    "speech": "Amazon Location searches nearby places and names through Lambda and API Gateway. Hospital-category coverage returned no matches in our Lahore tests, so the app also exposes the independent saved directory, clearly separated from AWS results. Ten injections per hospital is simulated demo inventory; real antivenom stock and treatment capability are unverified."
   },
   {
-    "image": "architecture.png",
-    "title": "Clear service boundaries and real delivery",
-    "caption": "API Gateway + Lambda + S3 + Amazon Location + Secrets Manager",
-    "speech": "Python validation prepares independent public facts for private S three delivery. Provider discovery stays in an attributed, temporary list. Google geometry stays on Google Maps. The backend route credential is stored in Secrets Manager. Optional Iceberg and Athena scripts are included, but those analytics extensions are not deployed."
-  },
-  {
-    "image": "traffic.png",
-    "title": "Real routes without activating paid Google billing",
-    "caption": "Maps Demo Key · traffic-aware Compute Routes · on-demand comparisons",
-    "speech": "The no billing Google Maps Demo Key renders the map and supports Compute Routes. The protected backend returns actual driving estimates and traffic speed intervals. An on demand comparison uses up to five supported route calls, avoiding the billing only matrix method. Provider limits can pause this prototype. Driving estimates are not ambulance response times."
-  },
-  {
-    "image": "photo.png",
-    "title": "A photograph must never delay finding care",
-    "caption": "Illustrations and local preview · no trained classifier connected",
-    "speech": "The optional photo helper contains labeled illustrations and a local image preview. No trained classifier is connected, and no identification is invented. VenomLink makes geographic access, its assumptions, and each point's evidence inspectable. Real healthcare partnerships and verified clinical data remain essential before any operational care use."
+    "image": "venomap-timeline-live.png",
+    "title": "Source. Validate. Explore.",
+    "caption": "React / TypeScript / AWS / ONNX Runtime Web",
+    "speech": "The stack combines React and TypeScript, Google Maps, and ONNX Runtime Web. The deployed AWS services are S three, Lambda, API Gateway, Amazon Location, Secrets Manager, IAM, and CloudWatch logs. Iceberg and Athena remain optional scripts, not deployed services. Explore the live map and public code to reuse the pattern. Confirm actual care directly with hospitals."
   }
 ]

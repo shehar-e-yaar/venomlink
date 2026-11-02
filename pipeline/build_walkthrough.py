@@ -17,7 +17,7 @@ for i,s in enumerate(segments):
     canvas=Image.new('RGB',(1600,1200),'#F7F6F2');canvas.paste(screen,((1600-screen.width)//2,14))
     draw=ImageDraw.Draw(canvas);draw.rectangle((0,1095,1600,1200),fill='#1C1D1F')
     draw.text((30,1110),s['title'],font=font,fill='#F5C451');draw.text((30,1153),s['caption'],font=small,fill='white')
-    draw.text((1510,1110),f'{i+1}/8',font=font,fill='#F5C451')
+    draw.text((1510,1110),f'{i+1}/{len(segments)}',font=font,fill='#F5C451')
     image=work/f'{i:02}.png';canvas.save(image)
     wav=work/f'{i:02}.wav'
     with wave.open(str(wav)) as w:duration=w.getnframes()/w.getframerate()+0.8
